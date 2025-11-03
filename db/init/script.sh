@@ -23,6 +23,7 @@ GRANT CREATE TABLE TO snippetvault;
 GRANT CREATE VIEW TO snippetvault;
 GRANT CREATE SEQUENCE TO snippetvault;
 GRANT CREATE PROCEDURE TO snippetvault;
+GRANT CREATE TRIGGER TO snippetvault;
 SQL
 
 # Create the flag file to indicate initialization is done
