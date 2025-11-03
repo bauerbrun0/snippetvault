@@ -65,7 +65,9 @@ ALTER TABLE role
 ALTER TABLE user_role
     ADD CONSTRAINT pk_user_role PRIMARY KEY (id);
 ALTER TABLE user_role
-    ADD CONSTRAINT fk_user_role_user FOREIGN KEY (user_id) REFERENCES snippetvault_user (id);
+    ADD CONSTRAINT fk_user_role_user
+    FOREIGN KEY (user_id) REFERENCES snippetvault_user (id)
+    ON DELETE CASCADE;
 ALTER TABLE user_role
     ADD CONSTRAINT fk_user_role_role FOREIGN KEY (role_id) REFERENCES role (id);
 ALTER TABLE user_role
