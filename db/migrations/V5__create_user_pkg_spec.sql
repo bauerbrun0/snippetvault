@@ -21,6 +21,6 @@ CREATE OR REPLACE PACKAGE user_pkg AS
         p_password_hash IN VARCHAR2 DEFAULT NULL,
         p_user OUT SYS_REFCURSOR
     );
-    FUNCTION get_user_roles(p_id IN NUMBER) RETURN role_array;
+    FUNCTION get_user_roles(p_id IN NUMBER) RETURN SYS_REFCURSOR;
 END user_pkg;
 /

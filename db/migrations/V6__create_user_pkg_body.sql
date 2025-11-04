@@ -210,21 +210,17 @@ CREATE OR REPLACE PACKAGE BODY user_pkg AS
             RAISE;
     END update_user;
 
-    FUNCTION get_user_roles(p_id IN NUMBER) RETURN role_array AS
-        v_roles role_array := role_array();
+    FUNCTION get_user_roles(p_id IN NUMBER) RETURN SYS_REFCURSOR AS
+        v_cur SYS_REFCURSOR;
     BEGIN
-        FOR r IN (
-            SELECT r.name
+        OPEN v_cur FOR
+            SELECT r.name AS name, r.ID AS id
             FROM role r
             JOIN user_role ur ON ur.role_id = r.id
             WHERE ur.user_id = p_id
-            ORDER BY r.name
-        ) LOOP
-            v_roles.extend;
-            v_roles(v_roles.COUNT) := r.name;
-        END LOOP;
+            ORDER BY r.name;
 
-        return v_roles;
+        return v_cur;
     END get_user_roles;
 END user_pkg;
 /
