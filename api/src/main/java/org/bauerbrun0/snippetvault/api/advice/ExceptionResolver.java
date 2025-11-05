@@ -1,5 +1,6 @@
 package org.bauerbrun0.snippetvault.api.advice;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bauerbrun0.snippetvault.api.exception.CannotDeleteLastAdminException;
 import org.bauerbrun0.snippetvault.api.exception.DuplicateUsernameException;
 import org.bauerbrun0.snippetvault.api.exception.UserNotFoundException;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 
+@Slf4j
 @RestControllerAdvice
 public class ExceptionResolver {
     @ExceptionHandler(NoHandlerFoundException.class)
@@ -63,6 +65,7 @@ public class ExceptionResolver {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception e) {
+        log.error(e.getMessage(), e);
         return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
     }
 }
