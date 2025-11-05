@@ -1,5 +1,8 @@
 package org.bauerbrun0.snippetvault.api.advice;
 
+import org.bauerbrun0.snippetvault.api.exception.CannotDeleteLastAdminException;
+import org.bauerbrun0.snippetvault.api.exception.DuplicateUsernameException;
+import org.bauerbrun0.snippetvault.api.exception.UserNotFoundException;
 import org.bauerbrun0.snippetvault.api.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -37,5 +40,23 @@ public class ExceptionResolver {
             message = HttpStatus.BAD_REQUEST.getReasonPhrase();
         }
         return new ErrorResponse(message);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleUserNotFoundException(UserNotFoundException e) {
+        return new ErrorResponse("User not found");
+    }
+
+    @ExceptionHandler(CannotDeleteLastAdminException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleCannotDeleteLastAdminException(CannotDeleteLastAdminException e) {
+        return new ErrorResponse("Cannot delete last admin user");
+    }
+
+    @ExceptionHandler(DuplicateUsernameException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDuplicateUsernameException(DuplicateUsernameException e) {
+        return new ErrorResponse("Username already exists");
     }
 }

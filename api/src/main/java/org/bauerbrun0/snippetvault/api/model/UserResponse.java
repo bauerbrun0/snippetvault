@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthorizedUserResponse {
+public class UserResponse {
     private Long userId;
     private String username;
     private LocalDateTime created;

@@ -34,15 +34,22 @@ public class UserService {
         return this.userRepository.deleteUser(id);
     }
 
-    public User createUser(String username, String passwordHash, String[] roles ) throws DuplicateUsernameException, RoleNotFoundException {
+    public User createUser(String username, String passwordHash, String[] roles )
+            throws DuplicateUsernameException, RoleNotFoundException {
         return this.userRepository.createUser(username, passwordHash, roles);
     }
 
-    public User  updateUser(Long id, String username, String passwordHash) throws UserNotFoundException, DuplicateUsernameException {
+    public User updateUser(Long id, String username, String passwordHash)
+            throws UserNotFoundException, DuplicateUsernameException {
         return this.userRepository.updateUser(id, username, passwordHash);
     }
 
     public List<Role> getUserRoles(Long id) {
         return this.userRepository.getUserRoles(id);
+    }
+
+    public boolean isUserAdmin(Long id) {
+        List<Role> roles = getUserRoles(id);
+        return roles.stream().anyMatch(role -> role.getName().equals(Role.ADMIN));
     }
 }

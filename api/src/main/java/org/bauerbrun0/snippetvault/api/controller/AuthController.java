@@ -66,7 +66,7 @@ public class AuthController {
     }
 
     @GetMapping("/current-user")
-    public AuthorizedUserResponse currentUser(@AuthenticationPrincipal UserDetails userDetails) {
+    public UserResponse currentUser(@AuthenticationPrincipal UserDetails userDetails) {
         String username =  userDetails.getUsername();
 
         boolean isAdmin = userDetails.getAuthorities().stream()
@@ -75,7 +75,7 @@ public class AuthController {
 
         User user = userService.getUserByUsername(username);
 
-        AuthorizedUserResponse response = new AuthorizedUserResponse();
+        UserResponse response = new UserResponse();
         response.setUsername(username);
         response.setCreated(user.getCreated());
         response.setUserId(user.getId());
