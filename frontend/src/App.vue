@@ -1,11 +1,20 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue'
+import Button from 'primevue/button'
+
+const count = ref(0)
+
+function inc() {
+  count.value++
+}
+</script>
 
 <template>
-  <h1>You did it!</h1>
+  <h1 class="text-3xl text-primary-500 font-bold underline">Hello world!</h1>
   <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
+    {{ count }}
   </p>
+  <Button label="increment" @click="inc()" />
 </template>
 
 <style scoped></style>
