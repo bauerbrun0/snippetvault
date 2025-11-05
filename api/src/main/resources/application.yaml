@@ -12,3 +12,16 @@ spring:
     oracle:
       sqlplus: true
     mixed: true
+
+  web:
+    resources:
+      add-mappings: false
+
+server:
+  error:
+    whitelabel:
+      enabled: false
+
+jwt:
+  secret: ZXhhbXBsZS1zZWNyZXQta2V5LXRvLWJlLXJlcGxhY2VkLXdpdGgtYS1sb25nZXItYW5kLXNlY3VyZXItb25l
+  expiration: 36000000
