@@ -59,4 +59,10 @@ public class ExceptionResolver {
     public ErrorResponse handleDuplicateUsernameException(DuplicateUsernameException e) {
         return new ErrorResponse("Username already exists");
     }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleException(Exception e) {
+        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+    }
 }
