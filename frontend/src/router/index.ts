@@ -49,12 +49,9 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _from, next) => {
-  const isLoggedIn = userStore.isLoggedIn()
-  const isAdmin = userStore.isAdmin()
-
-  if (to.meta.requiresAuth && !isLoggedIn) return next({ name: 'login' })
-  if (to.meta.requiresAdmin && !isAdmin) return next({ name: 'snippets' })
-  if (to.name === 'login' && isLoggedIn) return next({ name: 'snippets' })
+  if (to.meta.requiresAuth && !userStore.isLoggedIn()) return next({ name: 'login' })
+  if (to.meta.requiresAdmin && !userStore.isAdmin()) return next({ name: 'snippets' })
+  if (to.name === 'login' && userStore.isLoggedIn()) return next({ name: 'snippets' })
   next()
 })
 

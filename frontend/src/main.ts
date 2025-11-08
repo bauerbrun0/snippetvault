@@ -9,6 +9,8 @@ import ToastService from 'primevue/toastservice'
 
 const app = createApp(App)
 
+const targetPath = window.location.pathname
+
 app.use(router)
 app.use(PrimeVue, {
   theme: {
@@ -23,4 +25,4 @@ app.directive('ripple', Ripple)
 
 app.mount('#app')
 
-await userStore.fetchUser()
+await userStore.fetchUser(targetPath)

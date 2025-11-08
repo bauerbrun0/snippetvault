@@ -1,60 +1,57 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Avatar from 'primevue/avatar'
 import Menubar from 'primevue/menubar'
 import Menu from 'primevue/menu'
 import type { MenuItem } from 'primevue/menuitem'
 import SnippetVaultLogo from './SnippetVaultLogo.vue'
 import { userStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const userMenuElement = ref()
 
-const menuItems = ref<MenuItem[]>(
-  userStore.user
-    ? [
-        {
-          label: 'Snippets',
-          route: '/snippets',
-        },
-        {
-          label: 'Tags',
-          route: '/tags',
-        },
-      ]
-    : [],
-)
+const menuItems = computed<MenuItem[]>(() => {
+  if (userStore.user !== null) {
+    return [
+      {
+        label: 'Snippets',
+        route: '/snippets',
+      },
+      {
+        label: 'Tags',
+        route: '/tags',
+      },
+    ]
+  }
+  return []
+})
 
-const userMenuItems = ref<MenuItem[]>(
-  userStore.isAdmin()
-    ? [
-        {
-          label: 'Profile',
-          route: '/profile',
-        },
-        {
-          label: 'Admin',
-          route: '/admin',
-        },
-        {
-          label: 'Logout',
-          command: () => {
-            console.log('Logging out...')
-          },
-        },
-      ]
-    : [
-        {
-          label: 'Profile',
-          route: '/profile',
-        },
-        {
-          label: 'Logout',
-          command: () => {
-            console.log('Logging out...')
-          },
-        },
-      ],
-)
+const userMenuItems = computed<MenuItem[]>(() => {
+  const items: MenuItem[] = [
+    {
+      label: 'Profile',
+      route: '/profile',
+    },
+  ]
+
+  if (userStore.user?.isAdmin) {
+    items.push({
+      label: 'Admin',
+      route: '/admin',
+    })
+  }
+
+  items.push({
+    label: 'Logout',
+    command: () => {
+      userStore.logout()
+      router.push('/login')
+    },
+  })
+
+  return items
+})
 
 const toggle = (event: Event) => {
   userMenuElement.value.toggle(event)
@@ -80,7 +77,7 @@ const toggle = (event: Event) => {
         </a>
       </template>
       <template #end>
-        <div v-if="userStore.user">
+        <div v-if="userStore.user !== null">
           <div class="flex items-center gap-2">
             <button
               type="button"

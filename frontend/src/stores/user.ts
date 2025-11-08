@@ -4,6 +4,7 @@ import { useToastService } from '@/utils/toast'
 import { fetchAuthenticatedUser } from '@/api/user'
 import { isResponseError } from 'up-fetch'
 import { errorSchema } from '@/utils/zod'
+import router from '@/router'
 
 const { showToast } = useToastService()
 
@@ -15,7 +16,7 @@ export type UserStore = {
   setUser: (user: User) => void
   isLoggedIn: () => boolean
   isAdmin: () => boolean
-  fetchUser: () => Promise<void>
+  fetchUser: (targetPath: string) => Promise<void>
   setLoadingUser: (loading: boolean) => void
   logout: () => void
 }
@@ -30,7 +31,7 @@ export const userStore: UserStore = reactive<UserStore>({
   setUser(user: User) {
     this.user = user
   },
-  fetchUser: async function () {
+  fetchUser: async function (targetPath: string) {
     if (!this.token) {
       this.setLoadingUser(false)
       return
@@ -38,9 +39,10 @@ export const userStore: UserStore = reactive<UserStore>({
 
     try {
       const user = await fetchAuthenticatedUser()
-      console.log('Fetched user:', user)
       this.setUser(user)
       this.setLoadingUser(false)
+      if (targetPath === '/login') targetPath = '/snippets'
+      router.push({ path: targetPath })
     } catch (error) {
       let toastMessage = 'Failed to fetch user data.'
       if (!isResponseError(error)) {

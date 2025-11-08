@@ -21,3 +21,27 @@ export async function fetchAuthenticatedUser() {
 
   return result
 }
+
+export async function loginUser(username: string, password: string) {
+  const result = await upfetch('/auth/login', {
+    method: 'POST',
+    body: { username, password },
+    schema: z
+      .object({
+        token: z.string(),
+        userId: z.number(),
+        username: z.string(),
+        created: dateArraySchema,
+        admin: z.boolean(),
+      })
+      .transform((data) => ({
+        token: data.token,
+        id: data.userId,
+        username: data.username,
+        created: data.created,
+        isAdmin: data.admin,
+      })),
+  })
+
+  return result
+}
