@@ -54,7 +54,7 @@ public class AuthController {
     @PreAuthorize("hasRole('ADMIN')")
     public RegisterUserResponse registerUser(@Valid @RequestBody RegisterUserRequest registerUserRequest) {
         String passwordHash = passwordEncoder.encode(registerUserRequest.getPassword());
-        String[] roles = registerUserRequest.isAdmin() ? new  String[]{Role.ADMIN, Role.ADMIN} : new String[]{Role.USER};
+        String[] roles = registerUserRequest.isAdmin() ? new String[]{Role.USER, Role.ADMIN} : new String[]{Role.USER};
         User user = this.userService.createUser(registerUserRequest.getUsername(), passwordHash, roles);
 
         RegisterUserResponse response = new RegisterUserResponse();

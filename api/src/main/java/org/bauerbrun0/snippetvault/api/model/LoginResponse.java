@@ -16,5 +16,5 @@ public class LoginResponse {
     private Long userId;
     private String username;
     private LocalDateTime created;
-    private boolean isAdmin;
+    private boolean admin;
 }

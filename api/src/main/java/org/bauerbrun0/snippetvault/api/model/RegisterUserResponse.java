@@ -15,5 +15,5 @@ public class RegisterUserResponse {
     private Long id;
     private String username;
     private LocalDateTime created;
-    private boolean isAdmin;
+    private boolean admin;
 }

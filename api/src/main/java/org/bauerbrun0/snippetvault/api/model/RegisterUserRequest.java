@@ -15,5 +15,5 @@ public class RegisterUserRequest {
     private String username;
     @NotBlank(message = "Password is required")
     private String password;
-    private boolean isAdmin;
+    private boolean admin;
 }
