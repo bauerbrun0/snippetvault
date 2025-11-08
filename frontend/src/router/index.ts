@@ -5,6 +5,7 @@ import SnippetsView from '@/views/SnippetsView.vue'
 import TagsView from '@/views/TagsView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { userStore } from '@/stores/user'
+import CreateUserView from '@/views/CreateUserView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,6 +36,15 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: AdminView,
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+      },
+    },
+    {
+      path: '/admin/create-user',
+      name: 'create-user',
+      component: CreateUserView,
       meta: {
         requiresAuth: true,
         requiresAdmin: true,

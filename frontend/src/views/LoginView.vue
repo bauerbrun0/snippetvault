@@ -23,18 +23,19 @@ const loginForm = reactive({
 async function submitLogin() {
   try {
     const response = await loginUser(loginForm.username, loginForm.password)
-    localStorage.setItem('token', response.token)
     userStore.setUser({
       id: response.id,
       username: response.username,
       created: response.created,
       isAdmin: response.isAdmin,
     })
+    userStore.setToken(response.token)
 
     toast.add({
       severity: 'success',
       summary: 'Login Successful',
       detail: `Welcome back, ${response.username}!`,
+      life: 3000,
     })
     router.push('/snippets')
   } catch (error) {

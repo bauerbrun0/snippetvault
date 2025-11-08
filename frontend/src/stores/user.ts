@@ -14,6 +14,7 @@ export type UserStore = {
   loadingUser: boolean
 
   setUser: (user: User) => void
+  setToken: (token: string) => void
   isLoggedIn: () => boolean
   isAdmin: () => boolean
   fetchUser: (targetPath: string) => Promise<void>
@@ -30,6 +31,10 @@ export const userStore: UserStore = reactive<UserStore>({
 
   setUser(user: User) {
     this.user = user
+  },
+  setToken(token: string) {
+    this.token = token
+    localStorage.setItem('token', token)
   },
   fetchUser: async function (targetPath: string) {
     if (!this.token) {
