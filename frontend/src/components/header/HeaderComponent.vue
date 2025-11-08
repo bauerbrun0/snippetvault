@@ -5,36 +5,56 @@ import Menubar from 'primevue/menubar'
 import Menu from 'primevue/menu'
 import type { MenuItem } from 'primevue/menuitem'
 import SnippetVaultLogo from './SnippetVaultLogo.vue'
+import { userStore } from '@/stores/user'
 
 const userMenuElement = ref()
 
-const menuItems = ref<MenuItem[]>([
-  {
-    label: 'Snippets',
-    route: '/snippets',
-  },
-  {
-    label: 'Tags',
-    route: '/tags',
-  },
-])
+const menuItems = ref<MenuItem[]>(
+  userStore.user
+    ? [
+        {
+          label: 'Snippets',
+          route: '/snippets',
+        },
+        {
+          label: 'Tags',
+          route: '/tags',
+        },
+      ]
+    : [],
+)
 
-const userMenuItems = ref<MenuItem[]>([
-  {
-    label: 'Profile',
-    route: '/profile',
-  },
-  {
-    label: 'Admin',
-    route: '/admin',
-  },
-  {
-    label: 'Logout',
-    command: () => {
-      console.log('Logging out...')
-    },
-  },
-])
+const userMenuItems = ref<MenuItem[]>(
+  userStore.isAdmin()
+    ? [
+        {
+          label: 'Profile',
+          route: '/profile',
+        },
+        {
+          label: 'Admin',
+          route: '/admin',
+        },
+        {
+          label: 'Logout',
+          command: () => {
+            console.log('Logging out...')
+          },
+        },
+      ]
+    : [
+        {
+          label: 'Profile',
+          route: '/profile',
+        },
+        {
+          label: 'Logout',
+          command: () => {
+            console.log('Logging out...')
+          },
+        },
+      ],
+)
 
 const toggle = (event: Event) => {
   userMenuElement.value.toggle(event)
@@ -42,7 +62,7 @@ const toggle = (event: Event) => {
 </script>
 
 <template>
-  <div class="card">
+  <div class="card min-h-[50px]">
     <Menubar :model="menuItems" class="">
       <template #start>
         <SnippetVaultLogo />
@@ -60,31 +80,33 @@ const toggle = (event: Event) => {
         </a>
       </template>
       <template #end>
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            @click="toggle"
-            aria-haspopup="true"
-            aria-controls="overlay_menu"
-            class="cursor-pointer"
-          >
-            <Avatar label="P" class="mr-2" size="normal" shape="circle" />
-          </button>
-        </div>
-        <Menu ref="userMenuElement" id="overlay_menu" :model="userMenuItems" :popup="true">
-          <template #item="{ item, props }">
-            <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
-              <a v-ripple :href="href" v-bind="props.action" @click="navigate">
+        <div v-if="userStore.user">
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              @click="toggle"
+              aria-haspopup="true"
+              aria-controls="overlay_menu"
+              class="cursor-pointer"
+            >
+              <Avatar label="P" class="mr-2" size="normal" shape="circle" />
+            </button>
+          </div>
+          <Menu ref="userMenuElement" id="overlay_menu" :model="userMenuItems" :popup="true">
+            <template #item="{ item, props }">
+              <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
+                <a v-ripple :href="href" v-bind="props.action" @click="navigate">
+                  <span :class="item.icon" />
+                  <span class="ml-2">{{ item.label }}</span>
+                </a>
+              </router-link>
+              <a v-else v-ripple :href="item.url" :target="item.target" v-bind="props.action">
                 <span :class="item.icon" />
                 <span class="ml-2">{{ item.label }}</span>
               </a>
-            </router-link>
-            <a v-else v-ripple :href="item.url" :target="item.target" v-bind="props.action">
-              <span :class="item.icon" />
-              <span class="ml-2">{{ item.label }}</span>
-            </a>
-          </template>
-        </Menu>
+            </template>
+          </Menu>
+        </div>
       </template>
     </Menubar>
   </div>
