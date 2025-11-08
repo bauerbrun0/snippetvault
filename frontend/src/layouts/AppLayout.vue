@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import HeaderComponent from '@/components/header/HeaderComponent.vue'
+import Toast from 'primevue/toast'
 </script>
 
 <template>
@@ -9,4 +10,5 @@ import HeaderComponent from '@/components/header/HeaderComponent.vue'
       <slot />
     </main>
   </div>
+  <Toast />
 </template>
