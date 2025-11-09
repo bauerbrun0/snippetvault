@@ -10,6 +10,9 @@ import { useRouter } from 'vue-router'
 import { createUser } from '@/api/user'
 import { isResponseError } from 'up-fetch'
 import { errorSchema } from '@/utils/zod'
+import { useTitle } from '@vueuse/core'
+
+useTitle('Create User | SnippetVault')
 
 const toast = useToast()
 const router = useRouter()

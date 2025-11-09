@@ -9,6 +9,9 @@ import { isResponseError } from 'up-fetch'
 import { errorSchema } from '@/utils/zod'
 import { useToast } from 'primevue/usetoast'
 import { userStore } from '@/stores/user'
+import { useTitle } from '@vueuse/core'
+
+useTitle('Admin | SnippetVault')
 
 const toast = useToast()
 

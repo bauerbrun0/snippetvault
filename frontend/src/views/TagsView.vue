@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import Button from 'primevue/button'
+import { useTitle } from '@vueuse/core'
+
+useTitle('Tags | SnippetVault')
 
 const count = ref(0)
 

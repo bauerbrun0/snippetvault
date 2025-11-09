@@ -11,6 +11,9 @@ import { errorSchema } from '@/utils/zod'
 import { reactive } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { useRouter } from 'vue-router'
+import { useTitle } from '@vueuse/core'
+
+useTitle('Login | SnippetVault')
 
 const router = useRouter()
 const toast = useToast()
