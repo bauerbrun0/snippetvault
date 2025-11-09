@@ -3,6 +3,7 @@ package org.bauerbrun0.snippetvault.api.config;
 import org.bauerbrun0.snippetvault.api.security.JwtRequestFilter;
 import org.bauerbrun0.snippetvault.api.security.JwtUtil;
 import org.bauerbrun0.snippetvault.api.service.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 @EnableWebSecurity
@@ -24,10 +26,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
+    private final HandlerExceptionResolver handlerExceptionResolver;
 
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtUtil jwtUtil) {
+    public SecurityConfig(
+            CustomUserDetailsService customUserDetailsService,
+            JwtUtil jwtUtil,
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver
+    ) {
         this.userDetailsService = customUserDetailsService;
         this.jwtUtil = jwtUtil;
+        this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
     @Bean
@@ -55,7 +63,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtRequestFilter jwtRequestFilter() {
-        return new JwtRequestFilter(jwtUtil, this.userDetailsService);
+        return new JwtRequestFilter(jwtUtil, this.userDetailsService, this.handlerExceptionResolver);
     }
 
     @Bean

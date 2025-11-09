@@ -64,8 +64,8 @@ public class ExceptionResolver {
     }
 
     @ExceptionHandler(ExpiredJwtException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorResponse handleExpiredToken(DuplicateUsernameException e) {
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleExpiredToken(ExpiredJwtException e) {
         return new ErrorResponse("Token expired");
     }
 
