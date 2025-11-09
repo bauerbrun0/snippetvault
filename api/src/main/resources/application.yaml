@@ -25,3 +25,6 @@ server:
 jwt:
   secret: ZXhhbXBsZS1zZWNyZXQta2V5LXRvLWJlLXJlcGxhY2VkLXdpdGgtYS1sb25nZXItYW5kLXNlY3VyZXItb25l
   expiration: 36000000
+
+app:
+  frontend: http://localhost:5173
