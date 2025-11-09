@@ -1,5 +1,6 @@
 package org.bauerbrun0.snippetvault.api.advice;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.bauerbrun0.snippetvault.api.exception.CannotDeleteLastAdminException;
 import org.bauerbrun0.snippetvault.api.exception.DuplicateUsernameException;
@@ -60,6 +61,12 @@ public class ExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDuplicateUsernameException(DuplicateUsernameException e) {
         return new ErrorResponse("Username already exists");
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleExpiredToken(DuplicateUsernameException e) {
+        return new ErrorResponse("Token expired");
     }
 
     @ExceptionHandler(Exception.class)
