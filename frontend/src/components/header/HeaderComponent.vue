@@ -86,7 +86,12 @@ const toggle = (event: Event) => {
               aria-controls="overlay_menu"
               class="cursor-pointer"
             >
-              <Avatar label="P" class="mr-2" size="normal" shape="circle" />
+              <Avatar
+                :label="userStore.user.username.charAt(0).toUpperCase()"
+                class="mr-2"
+                size="normal"
+                shape="circle"
+              />
             </button>
           </div>
           <Menu ref="userMenuElement" id="overlay_menu" :model="userMenuItems" :popup="true">
