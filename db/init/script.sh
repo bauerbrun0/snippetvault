@@ -25,6 +25,10 @@ GRANT CREATE SEQUENCE TO snippetvault;
 GRANT CREATE PROCEDURE TO snippetvault;
 GRANT CREATE TRIGGER TO snippetvault;
 GRANT CREATE TYPE TO snippetvault;
+GRANT CREATE INDEX TO snippetvault;
+GRANT EXECUTE ON CTXSYS.CTX_DDL TO snippetvault;
+GRANT EXECUTE ON CTXSYS.CTX_CLS TO snippetvault;
+GRANT EXECUTE ON CTXSYS.CTX_OUTPUT TO snippetvault;
 SQL
 
 # Create the flag file to indicate initialization is done
