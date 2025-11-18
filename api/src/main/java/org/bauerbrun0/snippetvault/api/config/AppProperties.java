@@ -12,4 +12,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
     private String frontend;
+    private String adminUser;
+    private String adminPassword;
 }
