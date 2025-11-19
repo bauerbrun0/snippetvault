@@ -6,6 +6,7 @@ import org.bauerbrun0.snippetvault.api.exception.UserRepositoryException;
 import org.bauerbrun0.snippetvault.api.model.Role;
 import org.bauerbrun0.snippetvault.api.model.User;
 import org.bauerbrun0.snippetvault.api.repository.UserRepository;
+import org.bauerbrun0.snippetvault.api.security.CustomUserDetails;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,12 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         try {
             User user = this.userRepository.getUserByUsername(username);
             List<Role> roles = this.userRepository.getUserRoles(user.getId());
-
-            return org.springframework.security.core.userdetails.User.builder()
-                    .username(user.getUsername())
-                    .password(user.getPasswordHash())
-                    .roles(roles.stream().map(Role::getName).toArray(String[]::new))
-                    .build();
+            return new CustomUserDetails(user, roles);
         } catch (UserNotFoundException e) {
             throw new UsernameNotFoundException("User not found");
         } catch (UserRepositoryException e) {
