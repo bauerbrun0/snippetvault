@@ -8,6 +8,7 @@ import org.bauerbrun0.snippetvault.api.exception.UserNotFoundException;
 import org.bauerbrun0.snippetvault.api.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -67,6 +68,12 @@ public class ExceptionResolver {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleExpiredToken(ExpiredJwtException e) {
         return new ErrorResponse("Token expired");
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        return new ErrorResponse("Unauthorized");
     }
 
     @ExceptionHandler(Exception.class)
