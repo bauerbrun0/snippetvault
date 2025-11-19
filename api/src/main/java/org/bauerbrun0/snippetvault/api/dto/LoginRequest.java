@@ -1,4 +1,4 @@
-package org.bauerbrun0.snippetvault.api.model;
+package org.bauerbrun0.snippetvault.api.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -10,10 +10,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterUserRequest {
+public class LoginRequest {
     @NotBlank(message = "Username is required")
     private String username;
     @NotBlank(message = "Password is required")
     private String password;
-    private boolean admin;
 }

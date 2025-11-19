@@ -1,4 +1,4 @@
-package org.bauerbrun0.snippetvault.api.model;
+package org.bauerbrun0.snippetvault.api.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

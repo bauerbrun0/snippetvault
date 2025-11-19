@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bauerbrun0.snippetvault.api.exception.CannotDeleteLastAdminException;
 import org.bauerbrun0.snippetvault.api.exception.DuplicateUsernameException;
 import org.bauerbrun0.snippetvault.api.exception.UserNotFoundException;
-import org.bauerbrun0.snippetvault.api.model.ErrorResponse;
+import org.bauerbrun0.snippetvault.api.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;

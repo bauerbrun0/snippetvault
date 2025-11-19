@@ -2,6 +2,7 @@ package org.bauerbrun0.snippetvault.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.bauerbrun0.snippetvault.api.dto.*;
 import org.bauerbrun0.snippetvault.api.model.*;
 import org.bauerbrun0.snippetvault.api.security.CustomUserDetails;
 import org.bauerbrun0.snippetvault.api.security.JwtUtil;
@@ -9,7 +10,6 @@ import org.bauerbrun0.snippetvault.api.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;

@@ -1,4 +1,4 @@
-package org.bauerbrun0.snippetvault.api.model;
+package org.bauerbrun0.snippetvault.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,9 +11,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponse {
-    private String token;
-    private Long userId;
+public class RegisterUserResponse {
+    private Long id;
     private String username;
     private LocalDateTime created;
     private boolean admin;

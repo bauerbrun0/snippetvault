@@ -2,9 +2,9 @@ package org.bauerbrun0.snippetvault.api.controller;
 
 
 import jakarta.validation.Valid;
-import org.bauerbrun0.snippetvault.api.model.UpdateUserRequest;
+import org.bauerbrun0.snippetvault.api.dto.UpdateUserRequest;
 import org.bauerbrun0.snippetvault.api.model.User;
-import org.bauerbrun0.snippetvault.api.model.UserResponse;
+import org.bauerbrun0.snippetvault.api.dto.UserResponse;
 import org.bauerbrun0.snippetvault.api.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
