@@ -3,6 +3,7 @@ package org.bauerbrun0.snippetvault.api.service;
 import org.bauerbrun0.snippetvault.api.model.Snippet;
 import org.bauerbrun0.snippetvault.api.repository.SnippetRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SnippetService {
@@ -12,6 +13,7 @@ public class SnippetService {
         this.snippetRepository = snippetRepository;
     }
 
+    @Transactional
     public Snippet create(Long userId, String title, String description) {
         return this.snippetRepository.createSnippet(userId, title, description);
     }
