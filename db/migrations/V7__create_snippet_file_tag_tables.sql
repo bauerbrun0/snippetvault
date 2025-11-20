@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------
 -- V7__create_snippet_file_tag_tables.sql                              --
 -------------------------------------------------------------------------
--- Creates SNIPPET, FILE, LANGUAGE, SNIPPET_FILE, TAG, TAG_SNIPPET     --
+-- Creates SNIPPET, FILE, LANGUAGE, TAG, TAG_SNIPPET                   --
 -- tables with sequences, constraints, triggers and indexes            --
 -------------------------------------------------------------------------
 
@@ -178,11 +178,7 @@ CREATE OR REPLACE TRIGGER trg_file_after_update
 BEGIN
     UPDATE snippet s
     SET s.updated = SYSDATE
-    WHERE s.id IN (
-        SELECT sf.snippet_id
-        FROM snippet_file sf
-        WHERE sf.file_id = :NEW.id
-    );
+    WHERE s.id = :NEW.snippet_id;
 END;
 /
 
