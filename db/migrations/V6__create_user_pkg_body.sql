@@ -53,6 +53,8 @@ CREATE OR REPLACE PACKAGE BODY user_pkg AS
         WHEN DUP_VAL_ON_INDEX THEN
             IF SQLERRM LIKE '%UQ_USER_USERNAME%' THEN
                 RAISE_APPLICATION_ERROR(constants_pkg.ERR_DUPLICATE_USERNAME, 'Username already taken');
+            ELSE
+                RAISE;
             END IF;
         WHEN OTHERS THEN
             RAISE;
@@ -205,6 +207,8 @@ CREATE OR REPLACE PACKAGE BODY user_pkg AS
         WHEN DUP_VAL_ON_INDEX THEN
             IF SQLERRM LIKE '%UQ_USER_USERNAME%' THEN
                 RAISE_APPLICATION_ERROR(constants_pkg.ERR_DUPLICATE_USERNAME, 'Username already taken');
+            ELSE
+                RAISE;
             END IF;
         WHEN OTHERS THEN
             RAISE;
