@@ -8,6 +8,7 @@ public enum DBErrorCodes {
     ROLE_NOT_FOUND(20002),
     USER_NOT_FOUND(20003),
     CANNOT_DELETE_LAST_ADMIN(20004),
+    INVALID_TAG_COLOR(20005),
     UNKNOWN(0);
 
     private final int code;

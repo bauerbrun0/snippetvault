@@ -4,6 +4,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.bauerbrun0.snippetvault.api.exception.CannotDeleteLastAdminException;
 import org.bauerbrun0.snippetvault.api.exception.DuplicateUsernameException;
+import org.bauerbrun0.snippetvault.api.exception.InvalidTagColorException;
 import org.bauerbrun0.snippetvault.api.exception.UserNotFoundException;
 import org.bauerbrun0.snippetvault.api.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -62,6 +63,12 @@ public class ExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDuplicateUsernameException(DuplicateUsernameException e) {
         return new ErrorResponse("Username already exists");
+    }
+
+    @ExceptionHandler(InvalidTagColorException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidTagColorException(InvalidTagColorException e) {
+        return new ErrorResponse("Invalid color string");
     }
 
     @ExceptionHandler(ExpiredJwtException.class)
