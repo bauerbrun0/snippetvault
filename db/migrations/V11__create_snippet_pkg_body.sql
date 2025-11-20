@@ -1,11 +1,12 @@
 -------------------------------------------------------------------------
--- V10__create_snippet_pkg_body.sql                                    --
+-- V11__create_snippet_pkg_body.sql                                    --
 -------------------------------------------------------------------------
 -- Creates the snippet package's body                                  --
 -------------------------------------------------------------------------
 
 
 CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
+    -- snippets --
     PROCEDURE create_snippet(
         p_user_id IN NUMBER,
         p_title IN VARCHAR2,
@@ -52,5 +53,54 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
                 RAISE;
             END IF;
     END create_snippet;
+    PROCEDURE get_paginated_snippets(
+        p_user_id IN NUMBER,
+        p_search_query IN VARCHAR2,
+        p_tag_ids IN number_array,
+        p_language_ids IN number_array,
+        p_page_number IN NUMBER,
+        p_page_size IN NUMBER,
+        p_total_count OUT NUMBER,
+        p_snippets OUT SYS_REFCURSOR
+    ) AS
+    BEGIN
+        NULL;
+    END get_paginated_snippets;
+    -- tags --
+    PROCEDURE create_tag(
+        p_user_id IN NUMBER,
+        p_name IN VARCHAR2,
+        p_color IN VARCHAR2,
+        p_tag OUT SYS_REFCURSOR
+    )AS
+        v_id NUMBER;
+    BEGIN
+        INSERT INTO tag (user_id, name, color)
+        VALUES (p_user_id, p_name, p_color)
+        RETURNING id INTO v_id;
+
+        OPEN p_tag FOR
+            SELECT t.id as id,
+                   t.user_id as user_id,
+                   t.name as name,
+                   t.color as color,
+                   t.created as created
+            FROM tag t
+            WHERE t.id = v_id;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            IF SQLCODE = -2291 THEN
+                IF SQLERRM LIKE '%FK_SNIPPET_USER%' THEN
+                    RAISE_APPLICATION_ERROR(constants_pkg.ERR_USER_NOT_FOUND, 'User not found');
+                END IF;
+            ELSIF SQLCODE = -2290 THEN
+                IF SQLERRM LIKE '%CHK_TAG_COLOR%' THEN
+                    RAISE_APPLICATION_ERROR(constants_pkg.ERR_TAG_COLOR_INVALID, 'Tag color must be a valid hex code');
+                END IF;
+            ELSE
+                RAISE;
+            END IF;
+    END create_tag;
 END snippet_pkg;
 /

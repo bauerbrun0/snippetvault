@@ -19,10 +19,6 @@ CREATE SEQUENCE file_seq
     START WITH 1
     INCREMENT BY 1;
 
-CREATE SEQUENCE snippet_file_seq
-    START WITH 1
-    INCREMENT BY 1;
-
 CREATE SEQUENCE language_seq
     START WITH 1
     INCREMENT BY 1;
@@ -52,6 +48,7 @@ CREATE TABLE snippet (
 
 CREATE TABLE snippetvault_file (
     id NUMBER,
+    snippet_id NUMBER NOT NULL,
     filename VARCHAR2(255 CHAR) NOT NULL,
     content CLOB NOT NULL,
     language_id NUMBER NOT NULL,
@@ -62,12 +59,6 @@ CREATE TABLE snippetvault_file (
 CREATE TABLE language (
     id NUMBER,
     name VARCHAR2(100 CHAR) NOT NULL
-);
-
-CREATE TABLE snippet_file (
-    id NUMBER,
-    snippet_id NUMBER NOT NULL,
-    file_id NUMBER NOT NULL
 );
 
 CREATE TABLE tag (
@@ -105,22 +96,13 @@ ALTER TABLE language
 ALTER TABLE snippetvault_file
     ADD CONSTRAINT pk_file PRIMARY KEY (id);
 ALTER TABLE snippetvault_file
+    ADD CONSTRAINT fk_file_snippet
+    FOREIGN KEY (snippet_id) REFERENCES snippet (id)
+    ON DELETE CASCADE;
+ALTER TABLE snippetvault_file
     ADD CONSTRAINT fk_file_language
     FOREIGN KEY (language_id) REFERENCES language (id)
     ON DELETE CASCADE;
-
-ALTER TABLE snippet_file
-    ADD CONSTRAINT pk_snippet_file PRIMARY KEY (id);
-ALTER TABLE snippet_file
-    ADD CONSTRAINT fk_snippet_file_snippet
-    FOREIGN KEY (snippet_id) REFERENCES snippet (id)
-    ON DELETE CASCADE;
-ALTER TABLE snippet_file
-    ADD CONSTRAINT fk_snippet_file_file
-    FOREIGN KEY (file_id) REFERENCES snippetvault_file (id)
-    ON DELETE CASCADE;
-ALTER TABLE snippet_file
-    ADD CONSTRAINT uq_snippet_file UNIQUE (snippet_id, file_id);
 
 ALTER TABLE tag
     ADD CONSTRAINT pk_tag PRIMARY KEY (id);
@@ -210,16 +192,6 @@ CREATE OR REPLACE TRIGGER trg_language_before_insert
 BEGIN
     IF :NEW.id IS NULL THEN
         SELECT language_seq.nextval INTO :NEW.id FROM dual;
-    END IF;
-END;
-/
-
-CREATE OR REPLACE TRIGGER trg_snippet_file_before_insert
-    BEFORE INSERT ON snippet_file
-    FOR EACH ROW
-BEGIN
-    IF :NEW.id IS NULL THEN
-        SELECT snippet_file_seq.nextval INTO :NEW.id FROM dual;
     END IF;
 END;
 /
