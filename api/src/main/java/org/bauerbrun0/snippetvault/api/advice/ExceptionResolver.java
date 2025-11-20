@@ -2,10 +2,7 @@ package org.bauerbrun0.snippetvault.api.advice;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.bauerbrun0.snippetvault.api.exception.CannotDeleteLastAdminException;
-import org.bauerbrun0.snippetvault.api.exception.DuplicateUsernameException;
-import org.bauerbrun0.snippetvault.api.exception.InvalidTagColorException;
-import org.bauerbrun0.snippetvault.api.exception.UserNotFoundException;
+import org.bauerbrun0.snippetvault.api.exception.*;
 import org.bauerbrun0.snippetvault.api.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -69,6 +66,24 @@ public class ExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleInvalidTagColorException(InvalidTagColorException e) {
         return new ErrorResponse("Invalid color string");
+    }
+
+    @ExceptionHandler(TagNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleTagNotFoundException(TagNotFoundException e) {
+        return new ErrorResponse("Tag not found");
+    }
+
+    @ExceptionHandler(DuplicateTagOnSnippetException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDuplicateTagOnSnippetException(DuplicateTagOnSnippetException e) {
+        return new ErrorResponse("Duplicate tag on snippet");
+    }
+
+    @ExceptionHandler(TagNotOnSnippetException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleTagNotOnSnippetException(TagNotOnSnippetException e) {
+        return new ErrorResponse("Tag is not on snippet");
     }
 
     @ExceptionHandler(ExpiredJwtException.class)

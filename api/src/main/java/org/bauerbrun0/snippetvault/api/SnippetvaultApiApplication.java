@@ -64,5 +64,8 @@ public class SnippetvaultApiApplication implements CommandLineRunner {
 
         Tag tag = this.tagService.createTag(1L, "First Tag", "#ffffff");
         log.info("Created tag {}", tag);
+
+        this.snippetService.addTagToSnippet(snippet.getId(), tag.getId());
+        log.info("Added tag {} to snippet {}", tag.getId(), snippet.getId());
     }
 }
