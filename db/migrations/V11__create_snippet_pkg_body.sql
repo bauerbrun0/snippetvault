@@ -13,12 +13,12 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
         p_description IN VARCHAR2,
         p_snippet OUT SYS_REFCURSOR
     ) AS
-        v_id NUMBER;
-        v_user_id NUMBER;
-        v_title VARCHAR2(255 CHAR);
+        v_id          NUMBER;
+        v_user_id     NUMBER;
+        v_title       VARCHAR2(255 CHAR);
         v_description VARCHAR2(4000 CHAR);
-        v_created TIMESTAMP;
-        v_updated TIMESTAMP;
+        v_created     TIMESTAMP;
+        v_updated     TIMESTAMP;
     BEGIN
         INSERT INTO snippet (user_id, title, description)
         VALUES (p_user_id, p_title, p_description)
@@ -36,12 +36,12 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
             v_updated;
 
         OPEN p_snippet FOR
-            SELECT v_id AS id,
-                   v_user_id AS user_id,
-                   v_title AS title,
+            SELECT v_id          AS id,
+                   v_user_id     AS user_id,
+                   v_title       AS title,
                    v_description AS description,
-                   v_created AS created,
-                   v_updated AS updated
+                   v_created     AS created,
+                   v_updated     AS updated
             FROM dual;
     EXCEPTION
         WHEN OTHERS THEN
@@ -65,8 +65,127 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
         p_total_count OUT NUMBER,
         p_snippets OUT SYS_REFCURSOR
     ) AS
+        v_search_query VARCHAR2(4000);
+        v_page_number NUMBER;
+        v_page_size   NUMBER;
     BEGIN
-        NULL;
+        v_search_query := TRIM(p_search_query);
+        v_page_number := NVL(p_page_number, 1);
+        v_page_size := NVL(p_page_size, 20);
+
+        -- Get the total count
+        SELECT total_count
+        INTO p_total_count
+        FROM (
+            WITH base_filtered AS (
+                SELECT v.id,
+                        CASE
+                            WHEN v_search_query IS NULL THEN 1
+                            WHEN LOWER(v.title) LIKE '%' || LOWER(v_search_query) || '%' THEN 1
+                            WHEN LOWER(v.description) LIKE '%' || LOWER(v_search_query) || '%' THEN 2
+                            WHEN LOWER(v.filename) LIKE '%' || LOWER(v_search_query) || '%' THEN 3
+                            WHEN CONTAINS(v.content, v_search_query) > 0 THEN 4
+                            ELSE 5
+                        END AS relevance
+                        FROM vw_snippet_search v
+                        WHERE v.user_id = p_user_id
+                        AND
+                            (
+                                p_tag_ids IS NULL
+                                OR CARDINALITY(p_tag_ids) = 0
+                                OR v.tag_id MEMBER OF p_tag_ids
+                            )
+                        AND
+                            (
+                                p_language_ids IS NULL
+                                OR CARDINALITY(p_language_ids) = 0
+                                OR v.language_id MEMBER OF p_language_ids
+                            )
+                ), filtered AS (
+                    SELECT id, relevance
+                    FROM base_filtered
+                    WHERE v_search_query IS NULL OR relevance < 5
+                ), deduplicated AS (
+                    SELECT id,
+                            MIN(relevance) AS relevance
+                    FROM filtered
+                    GROUP BY id
+                )
+                SELECT count(*) as total_count
+                FROM deduplicated
+            );
+
+        -- get the result
+        OPEN p_snippets FOR
+        WITH base_filtered AS (
+            SELECT v.id,
+                    CASE
+                        WHEN v_search_query IS NULL THEN 1
+                        WHEN LOWER(v.title) LIKE '%' || LOWER(v_search_query) || '%' THEN 1
+                        WHEN LOWER(v.description) LIKE '%' || LOWER(v_search_query) || '%' THEN 2
+                        WHEN LOWER(v.filename) LIKE '%' || LOWER(v_search_query) || '%' THEN 3
+                        WHEN LOWER(v.content) LIKE '%' || LOWER(v_search_query) || '%' THEN 4
+                        ELSE 5
+                    END AS relevance
+                    FROM vw_snippet_search v
+                    WHERE v.user_id = p_user_id
+                    AND
+                        (
+                            p_tag_ids IS NULL
+                            OR CARDINALITY(p_tag_ids) = 0
+                            OR v.tag_id MEMBER OF p_tag_ids
+                        )
+                    AND
+                        (
+                            p_language_ids IS NULL
+                            OR CARDINALITY(p_language_ids) = 0
+                            OR v.language_id MEMBER OF p_language_ids
+                        )
+            ), filtered AS (
+                SELECT bf.id, bf.relevance
+                FROM base_filtered bf
+                WHERE v_search_query IS NULL OR relevance < 5
+            ), deduplicated AS (
+                SELECT f.id,
+                        MIN(f.relevance) AS relevance
+                FROM filtered f
+                GROUP BY f.id
+            ), extended AS (
+                SELECT d.id,
+                       d.relevance,
+                       s.user_id,
+                       s.title,
+                       s.description,
+                       s.created,
+                       s.updated,
+                       count(DISTINCT v.file_id) AS file_count,
+                       cast(collect( v.language_id ) AS number_array) AS language_ids,
+                       cast(collect( v.tag_id ) AS number_array) AS tag_ids,
+                       ROW_NUMBER() OVER (
+                            ORDER BY d.relevance, s.created DESC, d.id
+                        ) AS row_number
+                FROM deduplicated d
+                JOIN snippet s ON s.id = d.id
+                LEFT JOIN vw_snippet_search v ON v.id = d.id
+                GROUP BY
+                    d.id, d.relevance,
+                    s.user_id, s.title, s.description, s.created, s.updated
+            )
+            SELECT id,
+                   user_id,
+                   title,
+                   description,
+                   created,
+                   updated,
+                   relevance,
+                   file_count,
+                   language_ids,
+                   tag_ids
+            FROM extended e
+            WHERE row_number BETWEEN
+                (v_page_number - 1) * v_page_size + 1 AND
+                v_page_number * v_page_size
+            ORDER BY row_number;
     END get_paginated_snippets;
 
     PROCEDURE add_tag_to_snippet(p_snippet_id IN NUMBER, p_tag_id IN NUMBER) AS
@@ -97,8 +216,10 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
 
     PROCEDURE remove_tag_from_snippet(p_snippet_id IN NUMBER, p_tag_id IN NUMBER) AS
     BEGIN
-        DELETE FROM snippet_tag
-        WHERE snippet_id = p_snippet_id AND tag_id = p_tag_id;
+        DELETE
+        FROM snippet_tag
+        WHERE snippet_id = p_snippet_id
+          AND tag_id = p_tag_id;
 
         IF SQL%ROWCOUNT = 0 THEN
             RAISE_APPLICATION_ERROR(constants_pkg.ERR_TAG_NOT_ON_SNIPPET, 'Tag is not on snippet');
@@ -111,7 +232,7 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
         p_name IN VARCHAR2,
         p_color IN VARCHAR2,
         p_tag OUT SYS_REFCURSOR
-    )AS
+    ) AS
         v_id NUMBER;
     BEGIN
         INSERT INTO tag (user_id, name, color)
@@ -119,10 +240,10 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
         RETURNING id INTO v_id;
 
         OPEN p_tag FOR
-            SELECT t.id as id,
+            SELECT t.id      as id,
                    t.user_id as user_id,
-                   t.name as name,
-                   t.color as color,
+                   t.name    as name,
+                   t.color   as color,
                    t.created as created
             FROM tag t
             WHERE t.id = v_id;
@@ -155,20 +276,20 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
         v_id NUMBER;
     BEGIN
         UPDATE tag
-            SET name = COALESCE(p_name, name),
-                color = COALESCE(p_color, color)
-            WHERE id = p_id
-            RETURNING id INTO v_id;
+        SET name  = COALESCE(p_name, name),
+            color = COALESCE(p_color, color)
+        WHERE id = p_id
+        RETURNING id INTO v_id;
 
         IF SQL%ROWCOUNT = 0 THEN
             RAISE_APPLICATION_ERROR(constants_pkg.ERR_TAG_NOT_FOUND, 'Tag not found');
         END IF;
 
         OPEN p_tag FOR
-            SELECT t.id AS id,
+            SELECT t.id      AS id,
                    t.user_id AS user_id,
-                   t.name AS name,
-                   t.color AS color,
+                   t.name    AS name,
+                   t.color   AS color,
                    t.created AS created
             FROM tag t
             WHERE id = v_id;
@@ -187,13 +308,15 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
     END update_tag;
 
     PROCEDURE delete_tag(p_id IN NUMBER, p_tag OUT SYS_REFCURSOR) AS
-        v_id NUMBER;
+        v_id      NUMBER;
         v_user_id NUMBER;
-        v_name VARCHAR2(150 CHAR);
-        v_color VARCHAR2(7 CHAR);
+        v_name    VARCHAR2(150 CHAR);
+        v_color   VARCHAR2(7 CHAR);
         v_created TIMESTAMP;
     BEGIN
-        DELETE FROM tag WHERE id = p_id
+        DELETE
+        FROM tag
+        WHERE id = p_id
         RETURNING id,
             user_id,
             name,
@@ -210,10 +333,10 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
         END IF;
 
         OPEN p_tag FOR
-            SELECT v_id AS id,
+            SELECT v_id      AS id,
                    v_user_id AS user_id,
-                   v_name AS name,
-                   v_color AS color,
+                   v_name    AS name,
+                   v_color   AS color,
                    v_created AS created
             FROM dual;
     END delete_tag;
@@ -235,10 +358,11 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
     END get_tags;
 
     FUNCTION get_tag(p_id IN NUMBER) RETURN SYS_REFCURSOR AS
-        v_cur SYS_REFCURSOR;
+        v_cur   SYS_REFCURSOR;
         v_count NUMBER;
     BEGIN
-        SELECT COUNT(*) INTO v_count
+        SELECT COUNT(*)
+        INTO v_count
         FROM tag
         WHERE id = p_id;
 
@@ -252,7 +376,8 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
                    name,
                    color,
                    created
-            FROM tag WHERE id = p_id;
+            FROM tag
+            WHERE id = p_id;
 
         RETURN v_cur;
     END get_tag;
