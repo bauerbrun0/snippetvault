@@ -23,12 +23,12 @@ CREATE OR REPLACE PACKAGE snippet_pkg AS
         p_total_count OUT NUMBER,
         p_snippets OUT SYS_REFCURSOR
     );
-    PROCEDURE get_snippet(p_id IN NUMBER, p_snippet OUT SYS_REFCURSOR);
+    FUNCTION get_snippet(p_id IN NUMBER) RETURN SYS_REFCURSOR;
     PROCEDURE delete_snippet(p_id IN NUMBER, p_snippet OUT SYS_REFCURSOR);
     PROCEDURE update_snippet(
         p_id IN NUMBER,
-        p_title IN VARCHAR2(255 CHAR),
-        p_description IN VARCHAR2(4000 CHAR),
+        p_title IN VARCHAR2,
+        p_description IN VARCHAR2,
         p_snippet OUT SYS_REFCURSOR
     );
     PROCEDURE add_tag_to_snippet(p_snippet_id IN NUMBER, p_tag_id IN NUMBER);

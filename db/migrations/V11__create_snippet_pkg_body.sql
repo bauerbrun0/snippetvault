@@ -188,9 +188,10 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
             ORDER BY row_number;
     END get_paginated_snippets;
 
-    PROCEDURE get_snippet(p_id IN NUMBER, p_snippet OUT SYS_REFCURSOR) AS
+    FUNCTION get_snippet(p_id IN NUMBER) RETURN  SYS_REFCURSOR AS
+        v_snippet SYS_REFCURSOR;
     BEGIN
-        OPEN p_snippet FOR
+        OPEN v_snippet FOR
             SELECT id,
                    user_id,
                    title,
@@ -199,6 +200,7 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
                    updated
             FROM snippet
             WHERE id = p_id;
+        RETURN v_snippet;
     END get_snippet;
 
     PROCEDURE delete_snippet(p_id IN NUMBER, p_snippet OUT SYS_REFCURSOR) AS
@@ -239,8 +241,8 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
 
     PROCEDURE update_snippet(
         p_id IN NUMBER,
-        p_title IN VARCHAR2(255 CHAR),
-        p_description IN VARCHAR2(4000 CHAR),
+        p_title IN VARCHAR2,
+        p_description IN VARCHAR2,
         p_snippet OUT SYS_REFCURSOR
     ) AS
         v_id NUMBER;
