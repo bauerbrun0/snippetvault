@@ -14,4 +14,4 @@ BEGIN
         FROM language l;
 
     RETURN languages_cursor;
-END get_languages_function;
+END get_languages;
