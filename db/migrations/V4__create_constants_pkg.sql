@@ -10,7 +10,6 @@ CREATE OR REPLACE PACKAGE constants_pkg AS
     -- error codes --
     -----------------
 
-    -- user_pkg errors
     ERR_DUPLICATE_USERNAME CONSTANT NUMBER := -20001;
     ERR_ROLE_NOT_FOUND CONSTANT NUMBER := -20002;
     ERR_USER_NOT_FOUND CONSTANT NUMBER := -20003;
