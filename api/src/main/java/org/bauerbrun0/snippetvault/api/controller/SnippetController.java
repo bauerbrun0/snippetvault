@@ -109,7 +109,7 @@ public class SnippetController {
     ) {
         return this.snippetService.createFile(
                 id,
-                createFileRequest.getFilename(),
+                createFileRequest.getFileName(),
                 createFileRequest.getContent(),
                 createFileRequest.getLanguageId()
         );
