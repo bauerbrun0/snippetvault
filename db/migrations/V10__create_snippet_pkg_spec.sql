@@ -6,7 +6,6 @@
 
 
 CREATE OR REPLACE PACKAGE snippet_pkg AS
-    -- snippets --
     PROCEDURE create_snippet(
         p_user_id IN NUMBER,
         p_title IN VARCHAR2,
@@ -33,5 +32,22 @@ CREATE OR REPLACE PACKAGE snippet_pkg AS
     );
     PROCEDURE add_tag_to_snippet(p_snippet_id IN NUMBER, p_tag_id IN NUMBER);
     PROCEDURE remove_tag_from_snippet(p_snippet_id IN NUMBER, p_tag_id IN NUMBER);
+    PROCEDURE create_file(
+        p_snippet_id IN NUMBER,
+        p_filename IN VARCHAR2,
+        p_content IN CLOB,
+        p_language_id IN NUMBER,
+        p_file OUT SYS_REFCURSOR
+    );
+    FUNCTION get_files_of_snippet(p_snippet_id IN NUMBER) RETURN SYS_REFCURSOR;
+    FUNCTION get_file(p_id IN NUMBER) RETURN SYS_REFCURSOR;
+    PROCEDURE update_file(
+        p_id IN NUMBER,
+        p_filename IN VARCHAR2 DEFAULT NULL,
+        p_content IN CLOB DEFAULT NULL,
+        p_language_id IN NUMBER DEFAULT NULL,
+        p_file OUT SYS_REFCURSOR
+    );
+    PROCEDURE delete_file(p_id IN NUMBER, p_file OUT SYS_REFCURSOR);
 END snippet_pkg;
 /

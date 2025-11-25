@@ -6,7 +6,6 @@
 
 
 CREATE OR REPLACE PACKAGE tag_pkg AS
-    -- tags --
     PROCEDURE create_tag(
         p_user_id IN NUMBER,
         p_name IN VARCHAR2,

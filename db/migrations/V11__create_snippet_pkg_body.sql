@@ -6,7 +6,6 @@
 
 
 CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
-    -- snippets --
     PROCEDURE create_snippet(
         p_user_id IN NUMBER,
         p_title IN VARCHAR2,
@@ -329,5 +328,206 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
             RAISE_APPLICATION_ERROR(constants_pkg.ERR_TAG_NOT_ON_SNIPPET, 'Tag is not on snippet');
         END IF;
     END;
+
+    PROCEDURE create_file(
+        p_snippet_id IN NUMBER,
+        p_filename IN VARCHAR2,
+        p_content IN CLOB,
+        p_language_id IN NUMBER,
+        p_file OUT SYS_REFCURSOR
+    ) AS
+        v_id NUMBER;
+        v_snippet_id NUMBER;
+        v_title VARCHAR2(255 CHAR);
+        v_content CLOB;
+        v_language_id NUMBER;
+        v_created TIMESTAMP;
+        v_updated TIMESTAMP;
+    BEGIN
+        INSERT INTO snippetvault_file (snippet_id, filename, content, language_id)
+        VALUES (
+                   p_snippet_id, p_filename, p_content, p_language_id
+               ) RETURNING id,
+            snippet_id,
+            filename,
+            content,
+            language_id,
+            created,
+            updated
+        INTO v_id,
+            v_snippet_id,
+            v_title,
+            v_content,
+            v_language_id,
+            v_created,
+            v_updated;
+
+        OPEN p_file FOR
+            SELECT v_id          AS id,
+                   v_snippet_id  AS snippet_id,
+                   v_title       AS filename,
+                   v_content     AS content,
+                   v_language_id AS language_id,
+                   v_created     AS created,
+                   v_updated     AS updated
+            FROM dual;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            IF SQLCODE = -2291 THEN
+                IF SQLERRM LIKE '%FK_FILE_SNIPPET%' THEN
+                    RAISE_APPLICATION_ERROR(constants_pkg.ERR_SNIPPET_NOT_FOUND, 'Snippet not found');
+                ELSIF SQLERRM LIKE '%FK_FILE_LANGUAGE%' THEN
+                    RAISE_APPLICATION_ERROR(constants_pkg.ERR_LANGUAGE_NOT_FOUND, 'Language not found');
+                ELSE
+                    RAISE;
+                END IF;
+            ELSE
+                RAISE;
+            end if;
+    END create_file;
+
+    FUNCTION get_files_of_snippet(p_snippet_id IN NUMBER) RETURN SYS_REFCURSOR AS
+        v_files SYS_REFCURSOR;
+    BEGIN
+        OPEN v_files FOR
+            SELECT id,
+                   snippet_id,
+                   filename,
+                   content,
+                   language_id,
+                   created,
+                   updated
+            FROM snippetvault_file
+            WHERE snippet_id = p_snippet_id;
+        RETURN v_files;
+    END get_files_of_snippet;
+
+    FUNCTION get_file(p_id IN NUMBER) RETURN SYS_REFCURSOR AS
+        v_file SYS_REFCURSOR;
+        v_count NUMBER;
+    BEGIN
+        SELECT COUNT(*) INTO v_count
+        FROM snippetvault_file
+        WHERE id = p_id;
+
+        IF v_count = 0 THEN
+            RAISE_APPLICATION_ERROR(constants_pkg.ERR_FILE_NOT_FOUND, 'File not found');
+        END IF;
+
+        OPEN v_file FOR
+            SELECT id,
+                   snippet_id,
+                   filename,
+                   content,
+                   language_id,
+                   created,
+                   updated
+            FROM snippetvault_file
+            WHERE id = p_id;
+        RETURN v_file;
+    END get_file;
+
+    PROCEDURE update_file(
+        p_id IN NUMBER,
+        p_filename IN VARCHAR2 DEFAULT NULL,
+        p_content IN CLOB DEFAULT NULL,
+        p_language_id IN NUMBER DEFAULT NULL,
+        p_file OUT SYS_REFCURSOR
+    ) AS
+        v_id NUMBER;
+        v_snippet_id NUMBER;
+        v_title VARCHAR2(255 CHAR);
+        v_content CLOB;
+        v_language_id NUMBER;
+        v_created TIMESTAMP;
+        v_updated TIMESTAMP;
+    BEGIN
+        UPDATE snippetvault_file
+        SET filename = COALESCE(p_filename, filename),
+            content = COALESCE(p_content, content),
+            language_id = COALESCE(p_language_id, language_id)
+        WHERE id = p_id
+        RETURNING id,
+            snippet_id,
+            filename,
+            content,
+            language_id,
+            created,
+            updated
+        INTO v_id,
+            v_snippet_id,
+            v_title,
+            v_content,
+            v_language_id,
+            v_created,
+            v_updated;
+
+        IF SQL%ROWCOUNT = 0 THEN
+            RAISE_APPLICATION_ERROR(constants_pkg.ERR_FILE_NOT_FOUND, 'File not found');
+        END IF;
+
+        OPEN p_file FOR
+            SELECT v_id          AS id,
+                   v_snippet_id  AS snippet_id,
+                   v_title       AS filename,
+                   v_content     AS content,
+                   v_language_id AS language_id,
+                   v_created     AS created,
+                   v_updated     AS updated
+            FROM dual;
+
+        EXCEPTION
+        WHEN OTHERS THEN
+            IF SQLCODE = -2291 THEN
+                IF SQLERRM LIKE '%FK_FILE_LANGUAGE%' THEN
+                    RAISE_APPLICATION_ERROR(constants_pkg.ERR_LANGUAGE_NOT_FOUND, 'Language not found');
+                ELSE
+                    RAISE;
+                END IF;
+            ELSE
+                RAISE;
+            END IF;
+    END update_file;
+
+    PROCEDURE delete_file(p_id IN NUMBER, p_file OUT SYS_REFCURSOR) AS
+        v_id NUMBER;
+        v_snippet_id NUMBER;
+        v_title VARCHAR2(255 CHAR);
+        v_content CLOB;
+        v_language_id NUMBER;
+        v_created TIMESTAMP;
+        v_updated TIMESTAMP;
+    BEGIN
+        DELETE FROM snippetvault_file WHERE id = p_id
+        RETURNING id,
+            snippet_id,
+            filename,
+            content,
+            language_id,
+            created,
+            updated
+        INTO v_id,
+            v_snippet_id,
+            v_title,
+            v_content,
+            v_language_id,
+            v_created,
+            v_updated;
+
+        IF SQL%ROWCOUNT = 0 THEN
+            RAISE_APPLICATION_ERROR(constants_pkg.ERR_FILE_NOT_FOUND, 'File not found');
+        END IF;
+
+        OPEN p_file FOR
+            SELECT v_id          AS id,
+                   v_snippet_id  AS snippet_id,
+                   v_title       AS filename,
+                   v_content     AS content,
+                   v_language_id AS language_id,
+                   v_created     AS created,
+                   v_updated     AS updated
+            FROM dual;
+    END delete_file;
 END snippet_pkg;
 /
