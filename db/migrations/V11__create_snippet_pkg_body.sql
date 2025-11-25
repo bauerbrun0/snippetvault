@@ -188,6 +188,99 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
             ORDER BY row_number;
     END get_paginated_snippets;
 
+    PROCEDURE get_snippet(p_id IN NUMBER, p_snippet OUT SYS_REFCURSOR) AS
+    BEGIN
+        OPEN p_snippet FOR
+            SELECT id,
+                   user_id,
+                   title,
+                   description,
+                   created,
+                   updated
+            FROM snippet
+            WHERE id = p_id;
+    END get_snippet;
+
+    PROCEDURE delete_snippet(p_id IN NUMBER, p_snippet OUT SYS_REFCURSOR) AS
+        v_id NUMBER;
+        v_user_id NUMBER;
+        v_title VARCHAR2(255 CHAR);
+        v_description VARCHAR2(4000 CHAR);
+        v_created TIMESTAMP;
+        v_updated TIMESTAMP;
+    BEGIN
+        DELETE FROM snippet WHERE id = p_id
+        RETURNING id,
+            user_id,
+            title,
+            description,
+            created,
+            updated
+        INTO v_id,
+            v_user_id,
+            v_title,
+            v_description,
+            v_created,
+            v_updated;
+
+        IF SQL%ROWCOUNT = 0 THEN
+            RAISE_APPLICATION_ERROR(constants_pkg.ERR_SNIPPET_NOT_FOUND, 'Snippet not found');
+        END IF;
+
+        OPEN p_snippet FOR
+            SELECT v_id AS id,
+                   v_user_id AS user_id,
+                   v_title AS title,
+                   v_description AS description,
+                   v_created AS created,
+                   v_updated AS updated
+            FROM dual;
+    END delete_snippet;
+
+    PROCEDURE update_snippet(
+        p_id IN NUMBER,
+        p_title IN VARCHAR2(255 CHAR),
+        p_description IN VARCHAR2(4000 CHAR),
+        p_snippet OUT SYS_REFCURSOR
+    ) AS
+        v_id NUMBER;
+        v_user_id NUMBER;
+        v_title VARCHAR2(255 CHAR);
+        v_description VARCHAR2(4000 CHAR);
+        v_created TIMESTAMP;
+        v_updated TIMESTAMP;
+    BEGIN
+        UPDATE snippet
+        SET title = COALESCE(p_title, title),
+            description = COALESCE(p_description, description)
+        WHERE id = p_id
+        RETURNING id,
+            user_id,
+            title,
+            description,
+            created,
+            updated
+        INTO v_id,
+            v_user_id,
+            v_title,
+            v_description,
+            v_created,
+            v_updated;
+
+        IF SQL%ROWCOUNT = 0 THEN
+            RAISE_APPLICATION_ERROR(constants_pkg.ERR_SNIPPET_NOT_FOUND, 'Snippet not found');
+        END IF;
+
+        OPEN p_snippet FOR
+            SELECT v_id AS id,
+                   v_user_id AS user_id,
+                   v_title AS title,
+                   v_description AS description,
+                   v_created AS created,
+                   v_updated AS updated
+            FROM dual;
+    END update_snippet;
+
     PROCEDURE add_tag_to_snippet(p_snippet_id IN NUMBER, p_tag_id IN NUMBER) AS
     BEGIN
         INSERT INTO snippet_tag (tag_id, snippet_id)
