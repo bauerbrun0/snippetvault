@@ -189,8 +189,17 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
     END get_paginated_snippets;
 
     FUNCTION get_snippet(p_id IN NUMBER) RETURN  SYS_REFCURSOR AS
+        v_count NUMBER;
         v_snippet SYS_REFCURSOR;
     BEGIN
+        SELECT COUNT(*) INTO v_count
+        FROM snippet
+        WHERE id = p_id;
+
+        IF v_count = 0 THEN
+            RAISE_APPLICATION_ERROR(constants_pkg.ERR_SNIPPET_NOT_FOUND, 'Snippet not found');
+        END IF;
+
         OPEN v_snippet FOR
             SELECT id,
                    user_id,
