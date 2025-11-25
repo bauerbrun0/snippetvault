@@ -99,6 +99,18 @@ public class ExceptionResolver {
         return new ErrorResponse("Snippet not found");
     }
 
+    @ExceptionHandler(FileNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleFileNotFoundException(FileNotFoundException e) {
+        return new ErrorResponse("File not found");
+    }
+
+    @ExceptionHandler(LanguageNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleLanguageNotFoundException(LanguageNotFoundException e) {
+        return new ErrorResponse("Language not found");
+    }
+
     @ExceptionHandler(ExpiredJwtException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleExpiredToken(ExpiredJwtException e) {
