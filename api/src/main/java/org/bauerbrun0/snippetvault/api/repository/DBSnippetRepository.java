@@ -2,10 +2,7 @@ package org.bauerbrun0.snippetvault.api.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bauerbrun0.snippetvault.api.exception.*;
-import org.bauerbrun0.snippetvault.api.model.DetailedSnippet;
-import org.bauerbrun0.snippetvault.api.model.Snippet;
-import org.bauerbrun0.snippetvault.api.model.SnippetSearchResult;
-import org.bauerbrun0.snippetvault.api.model.User;
+import org.bauerbrun0.snippetvault.api.model.*;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlOutParameter;
@@ -34,6 +31,11 @@ public class DBSnippetRepository implements SnippetRepository {
     private final SimpleJdbcCall getSnippetCall;
     private final SimpleJdbcCall deleteSnippetCall;
     private final SimpleJdbcCall updateSnippetCall;
+    private final SimpleJdbcCall createFileCall;
+    private final SimpleJdbcCall getFilesCall;
+    private final SimpleJdbcCall getFileCall;
+    private final SimpleJdbcCall updateFileCall;
+    private final SimpleJdbcCall deleteFileCall;
 
     public DBSnippetRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -44,6 +46,11 @@ public class DBSnippetRepository implements SnippetRepository {
         this.getSnippetCall = createGetSnippetCall(jdbcTemplate);
         this.deleteSnippetCall = createDeleteSnippetCall(jdbcTemplate);
         this.updateSnippetCall = createUpdateSnippetCall(jdbcTemplate);
+        this.createFileCall = createCreateFileCall(jdbcTemplate);
+        this.getFilesCall = createGetFilesCall(jdbcTemplate);
+        this.getFileCall = createGetFileCall(jdbcTemplate);
+        this.updateFileCall = createUpdateFileCall(jdbcTemplate);
+        this.deleteFileCall = createDeleteFileCall(jdbcTemplate);
     }
 
     private static SimpleJdbcCall createCreateSnippetCall(JdbcTemplate template) {
@@ -147,6 +154,77 @@ public class DBSnippetRepository implements SnippetRepository {
                 .returningResultSet("P_SNIPPET", DBSnippetRepository::mapSnippetResultRow);
     }
 
+    private static SimpleJdbcCall createCreateFileCall(JdbcTemplate template) {
+        return new SimpleJdbcCall(template)
+                .withCatalogName("SNIPPET_PKG")
+                .withProcedureName("CREATE_FILE")
+                .withoutProcedureColumnMetaDataAccess()
+                .useInParameterNames("P_SNIPPET_ID", "P_FILENAME", "P_CONTENT", "P_LANGUAGE_ID")
+                .declareParameters(
+                        new SqlParameter("P_SNIPPET_ID", Types.NUMERIC),
+                        new SqlParameter("P_FILENAME", Types.VARCHAR),
+                        new SqlParameter("P_CONTENT", Types.CLOB),
+                        new SqlParameter("P_LANGUAGE_ID", Types.NUMERIC),
+                        new SqlOutParameter("P_FILE", Types.REF_CURSOR)
+                )
+                .returningResultSet("P_FILE", DBSnippetRepository::mapFileResultRow);
+    }
+
+    private static SimpleJdbcCall createGetFilesCall(JdbcTemplate template) {
+        return new SimpleJdbcCall(template)
+                .withCatalogName("SNIPPET_PKG")
+                .withFunctionName("GET_FILES_OF_SNIPPET")
+                .withoutProcedureColumnMetaDataAccess()
+                .useInParameterNames("P_SNIPPET_ID")
+                .declareParameters(
+                        new SqlOutParameter("RESULT", Types.REF_CURSOR),
+                        new SqlParameter("P_SNIPPET_ID", Types.NUMERIC)
+                )
+                .returningResultSet("RESULT", DBSnippetRepository::mapFileResultRow);
+    }
+
+    private static SimpleJdbcCall createGetFileCall(JdbcTemplate template) {
+        return new SimpleJdbcCall(template)
+                .withCatalogName("SNIPPET_PKG")
+                .withFunctionName("GET_FILE")
+                .withoutProcedureColumnMetaDataAccess()
+                .useInParameterNames("P_ID")
+                .declareParameters(
+                        new SqlOutParameter("RESULT", Types.REF_CURSOR),
+                        new SqlParameter("P_ID", Types.NUMERIC)
+                )
+                .returningResultSet("RESULT", DBSnippetRepository::mapFileResultRow);
+    }
+
+    private static SimpleJdbcCall createUpdateFileCall(JdbcTemplate template) {
+        return new SimpleJdbcCall(template)
+                .withCatalogName("SNIPPET_PKG")
+                .withProcedureName("UPDATE_FILE")
+                .withoutProcedureColumnMetaDataAccess()
+                .useInParameterNames("P_ID", "P_FILENAME", "P_CONTENT", "P_LANGUAGE_ID")
+                .declareParameters(
+                        new SqlParameter("P_ID", Types.NUMERIC),
+                        new SqlParameter("P_FILENAME", Types.VARCHAR),
+                        new SqlParameter("P_CONTENT", Types.CLOB),
+                        new SqlParameter("P_LANGUAGE_ID", Types.NUMERIC),
+                        new SqlOutParameter("P_FILE", Types.REF_CURSOR)
+                )
+                .returningResultSet("P_FILE", DBSnippetRepository::mapFileResultRow);
+    }
+
+    private static SimpleJdbcCall createDeleteFileCall(JdbcTemplate template) {
+        return new SimpleJdbcCall(template)
+                .withCatalogName("SNIPPET_PKG")
+                .withProcedureName("DELETE_FILE")
+                .withoutProcedureColumnMetaDataAccess()
+                .useInParameterNames("P_ID")
+                .declareParameters(
+                        new SqlParameter("P_ID", Types.NUMERIC),
+                        new SqlOutParameter("P_FILE", Types.REF_CURSOR)
+                )
+                .returningResultSet("P_FILE", DBSnippetRepository::mapFileResultRow);
+    }
+
     private static Object mapSnippetResultRow(ResultSet rs, int rowNum) throws SQLException {
         Snippet snippet = new Snippet();
         snippet.setId(rs.getLong("ID"));
@@ -193,6 +271,18 @@ public class DBSnippetRepository implements SnippetRepository {
         snippet.setTagIds(tagIds);
 
         return snippet;
+    }
+
+    private static Object mapFileResultRow(ResultSet rs, int rowNum) throws SQLException {
+        File file = new File();
+        file.setId(rs.getLong("ID"));
+        file.setSnippetId(rs.getLong("SNIPPET_ID"));
+        file.setFilename(rs.getString("FILENAME"));
+        file.setContent(rs.getString("CONTENT"));
+        file.setLanguageId(rs.getLong("LANGUAGE_ID"));
+        file.setCreated(rs.getTimestamp("CREATED").toLocalDateTime());
+        file.setUpdated(rs.getTimestamp("UPDATED").toLocalDateTime());
+        return file;
     }
 
     @Override
@@ -365,5 +455,117 @@ public class DBSnippetRepository implements SnippetRepository {
 
         List<Snippet> snippets = DBRepositoryUtils.getListFromResultObject(result.get("P_SNIPPET"), Snippet.class);
         return snippets.isEmpty() ? null : snippets.get(0);
+    }
+
+    @Override
+    public File createFile(Long snippetId, String filename, String content, Long languageId) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("P_SNIPPET_ID", snippetId, Types.NUMERIC)
+                .addValue("P_FILENAME", filename, Types.VARCHAR)
+                .addValue("P_CONTENT", content, Types.CLOB)
+                .addValue("P_LANGUAGE_ID", languageId, Types.NUMERIC);
+
+        Map<String, Object> result;
+        try {
+            result = this.createFileCall.execute(params);
+            List<File> files = DBRepositoryUtils.getListFromResultObject(result.get("P_FILE"), File.class);
+            return files.isEmpty() ? null : files.get(0);
+        } catch (DataAccessException e) {
+            switch (DBErrorCodes.fromCode(DBRepositoryUtils.getSqlErrorCode(e))) {
+                case SNIPPET_NOT_FOUND:
+                    throw new SnippetNotFoundException();
+                case LANGUAGE_NOT_FOUND:
+                    throw new LanguageNotFoundException();
+                default:
+                    throw new SnippetRepositoryException("Failed to create file", e);
+            }
+        } catch (Exception e) {
+            throw new SnippetRepositoryException("Failed to create file", e);
+        }
+    }
+
+    @Override
+    public List<File> getFiles(Long snippetId) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("P_SNIPPET_ID", snippetId, Types.NUMERIC);
+
+        Map<String, Object> result;
+        try {
+            result = this.getFilesCall.execute(params);
+            return DBRepositoryUtils.getListFromResultObject(result.get("RESULT"), File.class);
+        } catch (Exception e) {
+            throw new SnippetRepositoryException("Failed to retrieve files for snippet", e);
+        }
+    }
+
+    @Override
+    public File getFile(Long fileId) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("P_ID", fileId, Types.NUMERIC);
+
+        Map<String, Object> result;
+        try {
+            result = this.getFileCall.execute(params);
+        } catch (Exception e) {
+            if (e instanceof DataAccessException dae &&
+                    DBRepositoryUtils.getSqlErrorCode(dae) == DBErrorCodes.FILE_NOT_FOUND.getCode()) {
+                throw new FileNotFoundException();
+            }
+            throw new SnippetRepositoryException("Failed to retrieve file by id", e);
+        }
+
+        List<File> files = DBRepositoryUtils.getListFromResultObject(result.get("RESULT"), File.class);
+        return files.isEmpty() ? null : files.get(0);
+    }
+
+    @Override
+    public File updateFile(Long fileId, String filename, String content, Long languageId) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("P_ID", fileId, Types.NUMERIC)
+                .addValue("P_FILENAME", filename, Types.VARCHAR)
+                .addValue("P_CONTENT", content, Types.CLOB)
+                .addValue("P_LANGUAGE_ID", languageId, Types.NUMERIC);
+
+        Map<String, Object> result;
+        try {
+            result = this.updateFileCall.execute(params);
+        } catch (DataAccessException e) {
+            switch (DBErrorCodes.fromCode(DBRepositoryUtils.getSqlErrorCode(e))) {
+                case FILE_NOT_FOUND:
+                    throw new FileNotFoundException();
+                case LANGUAGE_NOT_FOUND:
+                    throw new LanguageNotFoundException();
+                default:
+                    throw new SnippetRepositoryException("Failed to update file", e);
+            }
+        } catch (Exception e) {
+            throw new SnippetRepositoryException("Failed to update file", e);
+        }
+
+        List<File> files = DBRepositoryUtils.getListFromResultObject(result.get("P_FILE"), File.class);
+        return files.isEmpty() ? null : files.get(0);
+    }
+
+    @Override
+    public File deleteFile(Long fileId) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("P_ID", fileId, Types.NUMERIC);
+
+        Map<String, Object> result;
+        try {
+            result = this.deleteFileCall.execute(params);
+        } catch (DataAccessException e) {
+            switch (DBErrorCodes.fromCode(DBRepositoryUtils.getSqlErrorCode(e))) {
+                case FILE_NOT_FOUND:
+                    throw new FileNotFoundException();
+                default:
+                    throw new SnippetRepositoryException("Failed to delete file", e);
+            }
+        } catch (Exception e) {
+            throw new SnippetRepositoryException("Failed to delete file", e);
+        }
+
+        List<File> files = DBRepositoryUtils.getListFromResultObject(result.get("P_FILE"), File.class);
+        return files.isEmpty() ? null : files.get(0);
     }
 }

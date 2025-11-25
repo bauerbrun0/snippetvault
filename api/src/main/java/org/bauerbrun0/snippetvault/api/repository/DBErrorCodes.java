@@ -13,6 +13,8 @@ public enum DBErrorCodes {
     DUPLICATE_TAG_ON_SNIPPET(20007),
     SNIPPET_NOT_FOUND(20008),
     TAG_NOT_ON_SNIPPET(20009),
+    LANGUAGE_NOT_FOUND(20010),
+    FILE_NOT_FOUND(20011),
     UNKNOWN(0);
 
     private final int code;

@@ -2,6 +2,7 @@ package org.bauerbrun0.snippetvault.api.repository;
 
 
 import org.bauerbrun0.snippetvault.api.exception.*;
+import org.bauerbrun0.snippetvault.api.model.File;
 import org.bauerbrun0.snippetvault.api.model.Snippet;
 import org.bauerbrun0.snippetvault.api.model.SnippetSearchResult;
 
@@ -17,4 +18,10 @@ public interface SnippetRepository {
     Snippet getSnippet(Long snippetId);
     Snippet deleteSnippet(Long snippetId);
     Snippet updateSnippet(Long snippetId, String title, String description);
+
+    File createFile(Long snippetId, String filename, String content, Long languageId);
+    List<File> getFiles(Long snippetId);
+    File getFile(Long fileId);
+    File updateFile(Long fileId, String filename, String content, Long languageId);
+    File deleteFile(Long fileId);
 }
