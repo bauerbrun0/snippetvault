@@ -40,14 +40,18 @@ CREATE OR REPLACE PACKAGE snippet_pkg AS
         p_file OUT SYS_REFCURSOR
     );
     FUNCTION get_files_of_snippet(p_snippet_id IN NUMBER) RETURN SYS_REFCURSOR;
-    FUNCTION get_file(p_id IN NUMBER) RETURN SYS_REFCURSOR;
     PROCEDURE update_file(
         p_id IN NUMBER,
+        p_snippet_id IN NUMBER,
         p_filename IN VARCHAR2 DEFAULT NULL,
         p_content IN CLOB DEFAULT NULL,
         p_language_id IN NUMBER DEFAULT NULL,
         p_file OUT SYS_REFCURSOR
     );
-    PROCEDURE delete_file(p_id IN NUMBER, p_file OUT SYS_REFCURSOR);
+    PROCEDURE delete_file(
+        p_id IN NUMBER,
+        p_snippet_id IN NUMBER,
+        p_file OUT SYS_REFCURSOR
+    );
 END snippet_pkg;
 /

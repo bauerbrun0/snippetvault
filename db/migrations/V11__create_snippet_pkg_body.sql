@@ -403,33 +403,9 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
         RETURN v_files;
     END get_files_of_snippet;
 
-    FUNCTION get_file(p_id IN NUMBER) RETURN SYS_REFCURSOR AS
-        v_file SYS_REFCURSOR;
-        v_count NUMBER;
-    BEGIN
-        SELECT COUNT(*) INTO v_count
-        FROM snippetvault_file
-        WHERE id = p_id;
-
-        IF v_count = 0 THEN
-            RAISE_APPLICATION_ERROR(constants_pkg.ERR_FILE_NOT_FOUND, 'File not found');
-        END IF;
-
-        OPEN v_file FOR
-            SELECT id,
-                   snippet_id,
-                   filename,
-                   content,
-                   language_id,
-                   created,
-                   updated
-            FROM snippetvault_file
-            WHERE id = p_id;
-        RETURN v_file;
-    END get_file;
-
     PROCEDURE update_file(
         p_id IN NUMBER,
+        p_snipet_id IN NUMBER,
         p_filename IN VARCHAR2 DEFAULT NULL,
         p_content IN CLOB DEFAULT NULL,
         p_language_id IN NUMBER DEFAULT NULL,
@@ -447,7 +423,7 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
         SET filename = COALESCE(p_filename, filename),
             content = COALESCE(p_content, content),
             language_id = COALESCE(p_language_id, language_id)
-        WHERE id = p_id
+        WHERE id = p_id AND snippet_id = p_snipet_id
         RETURNING id,
             snippet_id,
             filename,
@@ -490,7 +466,11 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
             END IF;
     END update_file;
 
-    PROCEDURE delete_file(p_id IN NUMBER, p_file OUT SYS_REFCURSOR) AS
+    PROCEDURE delete_file(
+        p_id IN NUMBER,
+        p_snippet_id IN NUMBER,
+        p_file OUT SYS_REFCURSOR
+    ) AS
         v_id NUMBER;
         v_snippet_id NUMBER;
         v_title VARCHAR2(255 CHAR);
@@ -499,7 +479,7 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
         v_created TIMESTAMP;
         v_updated TIMESTAMP;
     BEGIN
-        DELETE FROM snippetvault_file WHERE id = p_id
+        DELETE FROM snippetvault_file WHERE id = p_id AND snippet_id = p_snippet_id
         RETURNING id,
             snippet_id,
             filename,
