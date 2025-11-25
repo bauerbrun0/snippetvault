@@ -33,21 +33,5 @@ CREATE OR REPLACE PACKAGE snippet_pkg AS
     );
     PROCEDURE add_tag_to_snippet(p_snippet_id IN NUMBER, p_tag_id IN NUMBER);
     PROCEDURE remove_tag_from_snippet(p_snippet_id IN NUMBER, p_tag_id IN NUMBER);
-    -- tags --
-    PROCEDURE create_tag(
-        p_user_id IN NUMBER,
-        p_name IN VARCHAR2,
-        p_color IN VARCHAR2,
-        p_tag OUT SYS_REFCURSOR
-    );
-    PROCEDURE update_tag(
-        p_id IN NUMBER,
-        p_name IN VARCHAR2 DEFAULT NULL,
-        p_color IN VARCHAR2 DEFAULT NULL,
-        p_tag OUT SYS_REFCURSOR
-    );
-    PROCEDURE delete_tag(p_id IN NUMBER, p_tag OUT SYS_REFCURSOR);
-    FUNCTION get_tags(p_user_id IN NUMBER) RETURN SYS_REFCURSOR;
-    FUNCTION get_tag(p_id IN NUMBER) RETURN SYS_REFCURSOR;
 END snippet_pkg;
 /
