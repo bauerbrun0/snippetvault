@@ -1,5 +1,6 @@
 package org.bauerbrun0.snippetvault.api.service;
 
+import org.bauerbrun0.snippetvault.api.model.File;
 import org.bauerbrun0.snippetvault.api.model.Snippet;
 import org.bauerbrun0.snippetvault.api.model.SnippetSearchResult;
 import org.bauerbrun0.snippetvault.api.repository.SnippetRepository;
@@ -53,5 +54,30 @@ public class SnippetService {
     @Transactional
     public Snippet updateSnippet(Long snippetId, String title, String description) {
         return this.snippetRepository.updateSnippet(snippetId, title, description);
+    }
+
+    @Transactional
+    public File createFile(Long snippetId, String filename, String content, Long languageId) {
+        return this.snippetRepository.createFile(snippetId, filename, content, languageId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<File> getFiles(Long snippetId) {
+        return this.snippetRepository.getFiles(snippetId);
+    }
+
+    @Transactional(readOnly = true)
+    public File getFile(Long fileId) {
+        return this.snippetRepository.getFile(fileId);
+    }
+
+    @Transactional
+    public File updateFile(Long fileId, String filename, String content, Long languageId) {
+        return this.snippetRepository.updateFile(fileId, filename, content, languageId);
+    }
+
+    @Transactional
+    public File deleteFile(Long fileId) {
+        return this.snippetRepository.deleteFile(fileId);
     }
 }
