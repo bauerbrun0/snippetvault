@@ -405,7 +405,7 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
 
     PROCEDURE update_file(
         p_id IN NUMBER,
-        p_snipet_id IN NUMBER,
+        p_snippet_id IN NUMBER,
         p_filename IN VARCHAR2 DEFAULT NULL,
         p_content IN CLOB DEFAULT NULL,
         p_language_id IN NUMBER DEFAULT NULL,
@@ -423,7 +423,7 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
         SET filename = COALESCE(p_filename, filename),
             content = COALESCE(p_content, content),
             language_id = COALESCE(p_language_id, language_id)
-        WHERE id = p_id AND snippet_id = p_snipet_id
+        WHERE id = p_id AND snippet_id = p_snippet_id
         RETURNING id,
             snippet_id,
             filename,
