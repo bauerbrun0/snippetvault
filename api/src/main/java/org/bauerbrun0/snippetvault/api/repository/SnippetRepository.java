@@ -21,7 +21,6 @@ public interface SnippetRepository {
 
     File createFile(Long snippetId, String filename, String content, Long languageId);
     List<File> getFiles(Long snippetId);
-    File getFile(Long fileId);
-    File updateFile(Long fileId, String filename, String content, Long languageId);
-    File deleteFile(Long fileId);
+    File updateFile(Long fileId, Long snippetId, String filename, String content, Long languageId);
+    File deleteFile(Long fileId, Long snippetId);
 }

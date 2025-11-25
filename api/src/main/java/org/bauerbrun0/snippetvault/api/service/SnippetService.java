@@ -66,18 +66,13 @@ public class SnippetService {
         return this.snippetRepository.getFiles(snippetId);
     }
 
-    @Transactional(readOnly = true)
-    public File getFile(Long fileId) {
-        return this.snippetRepository.getFile(fileId);
+    @Transactional
+    public File updateFile(Long fileId, Long snippetId, String filename, String content, Long languageId) {
+        return this.snippetRepository.updateFile(fileId, snippetId, filename, content, languageId);
     }
 
     @Transactional
-    public File updateFile(Long fileId, String filename, String content, Long languageId) {
-        return this.snippetRepository.updateFile(fileId, filename, content, languageId);
-    }
-
-    @Transactional
-    public File deleteFile(Long fileId) {
-        return this.snippetRepository.deleteFile(fileId);
+    public File deleteFile(Long fileId, Long snippetId) {
+        return this.snippetRepository.deleteFile(fileId, snippetId);
     }
 }

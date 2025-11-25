@@ -2,9 +2,8 @@ package org.bauerbrun0.snippetvault.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.bauerbrun0.snippetvault.api.dto.CreateSnippetRequest;
-import org.bauerbrun0.snippetvault.api.dto.SearchSnippetsRequest;
-import org.bauerbrun0.snippetvault.api.dto.UpdateSnippetRequest;
+import org.bauerbrun0.snippetvault.api.dto.*;
+import org.bauerbrun0.snippetvault.api.model.File;
 import org.bauerbrun0.snippetvault.api.model.Snippet;
 import org.bauerbrun0.snippetvault.api.model.SnippetSearchResult;
 import org.bauerbrun0.snippetvault.api.security.CustomUserDetails;
@@ -13,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -98,5 +99,52 @@ public class SnippetController {
             @P("tagId") @PathVariable("tagId") Long tagId
     ) {
         this.snippetService.removeTagFromSnippet(id, tagId);
+    }
+
+    @PostMapping("/{id}/files")
+    @PreAuthorize("@snippetSecurity.isOwner(authentication, #id)")
+    public File createFile(
+            @P("id") @PathVariable("id") Long id,
+            @Valid @RequestBody CreateFileRequest createFileRequest
+    ) {
+        return this.snippetService.createFile(
+                id,
+                createFileRequest.getFilename(),
+                createFileRequest.getContent(),
+                createFileRequest.getLanguageId()
+        );
+    }
+
+    @GetMapping("/{id}/files")
+    @PreAuthorize("@snippetSecurity.isOwner(authentication, #id)")
+    public List<File> getFiles(
+            @P("id") @PathVariable("id") Long id
+    ) {
+        return this.snippetService.getFiles(id);
+    }
+
+    @PatchMapping("/{id}/files/{fileId}")
+    @PreAuthorize("@snippetSecurity.isOwner(authentication, #id)")
+    public File updateFile(
+            @P("id") @PathVariable("id") Long id,
+            @P("fileId") @PathVariable("fileId") Long fileId,
+            @Valid @RequestBody UpdateFileRequest updateFileRequest
+    ) {
+        return this.snippetService.updateFile(
+                fileId,
+                id,
+                updateFileRequest.getFilename(),
+                updateFileRequest.getContent(),
+                updateFileRequest.getLanguageId()
+        );
+    }
+
+    @DeleteMapping("/{id}/files/{fileId}")
+    @PreAuthorize("@snippetSecurity.isOwner(authentication, #id)")
+    public File deleteFile(
+            @P("id") @PathVariable("id") Long id,
+            @P("fileId") @PathVariable("fileId") Long fileId
+    ) {
+        return this.snippetService.deleteFile(fileId, id);
     }
 }
