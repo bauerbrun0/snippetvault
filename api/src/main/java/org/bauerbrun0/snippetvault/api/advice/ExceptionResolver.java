@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bauerbrun0.snippetvault.api.exception.*;
 import org.bauerbrun0.snippetvault.api.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
@@ -42,6 +43,12 @@ public class ExceptionResolver {
             message = HttpStatus.BAD_REQUEST.getReasonPhrase();
         }
         return new ErrorResponse(message);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        return new ErrorResponse(HttpStatus.BAD_REQUEST.getReasonPhrase());
     }
 
     @ExceptionHandler(UserNotFoundException.class)

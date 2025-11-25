@@ -6,8 +6,6 @@ import org.bauerbrun0.snippetvault.api.exception.DuplicateUsernameException;
 import org.bauerbrun0.snippetvault.api.model.Role;
 import org.bauerbrun0.snippetvault.api.model.Snippet;
 import org.bauerbrun0.snippetvault.api.model.Tag;
-import org.bauerbrun0.snippetvault.api.repository.SnippetRepository;
-import org.bauerbrun0.snippetvault.api.repository.UserRepository;
 import org.bauerbrun0.snippetvault.api.service.SnippetService;
 import org.bauerbrun0.snippetvault.api.service.TagService;
 import org.bauerbrun0.snippetvault.api.service.UserService;
@@ -67,5 +65,8 @@ public class SnippetvaultApiApplication implements CommandLineRunner {
 
         this.snippetService.addTagToSnippet(snippet.getId(), tag.getId());
         log.info("Added tag {} to snippet {}", tag.getId(), snippet.getId());
+
+        var result = this.snippetService.getPaginatedSnippets(1L, null, null, null, 1L, 3L);
+        log.info("Result is {}", result);
     }
 }
