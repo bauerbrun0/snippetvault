@@ -14,4 +14,7 @@ public interface SnippetRepository {
     SnippetSearchResult getPaginatedSnippets(
             Long userId, String searchQuery, List<Long> tagIds, List<Long> languageIds, Long pageNumber, Long pageSize
     );
+    Snippet getSnippet(Long snippetId);
+    Snippet deleteSnippet(Long snippetId);
+    Snippet updateSnippet(Long snippetId, String title, String description);
 }

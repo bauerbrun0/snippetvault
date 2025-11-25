@@ -31,12 +31,27 @@ public class SnippetService {
         this.snippetRepository.removeTagFromSnippet(snippetId, tagId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public SnippetSearchResult getPaginatedSnippets(
             Long userId, String searchQuery, List<Long> tagIds, List<Long> languageIds, Long pageNumber, Long pageSize
     ) {
         return this.snippetRepository.getPaginatedSnippets(
                 userId, searchQuery, tagIds, languageIds, pageNumber, pageSize
         );
+    }
+
+    @Transactional(readOnly = true)
+    public Snippet getSnippet(Long snippetId) {
+        return this.snippetRepository.getSnippet(snippetId);
+    }
+
+    @Transactional
+    public Snippet deleteSnippet(Long snippetId) {
+        return this.snippetRepository.deleteSnippet(snippetId);
+    }
+
+    @Transactional
+    public Snippet updateSnippet(Long snippetId, String title, String description) {
+        return this.snippetRepository.updateSnippet(snippetId, title, description);
     }
 }

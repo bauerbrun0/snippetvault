@@ -5,6 +5,7 @@ import org.bauerbrun0.snippetvault.api.exception.*;
 import org.bauerbrun0.snippetvault.api.model.DetailedSnippet;
 import org.bauerbrun0.snippetvault.api.model.Snippet;
 import org.bauerbrun0.snippetvault.api.model.SnippetSearchResult;
+import org.bauerbrun0.snippetvault.api.model.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlOutParameter;
@@ -30,6 +31,9 @@ public class DBSnippetRepository implements SnippetRepository {
     private final SimpleJdbcCall addTagToSnippetCall;
     private final SimpleJdbcCall removeTagFromSnippetCall;
     private final SimpleJdbcCall getPaginatedSnippetsCall;
+    private final SimpleJdbcCall getSnippetCall;
+    private final SimpleJdbcCall deleteSnippetCall;
+    private final SimpleJdbcCall updateSnippetCall;
 
     public DBSnippetRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -37,6 +41,9 @@ public class DBSnippetRepository implements SnippetRepository {
         this.addTagToSnippetCall = createAddTagToSnippetCall(jdbcTemplate);
         this.removeTagFromSnippetCall = createRemoveTagFromSnippetCall(jdbcTemplate);
         this.getPaginatedSnippetsCall = createGetPaginatedSnippetsCall(jdbcTemplate);
+        this.getSnippetCall = createGetSnippetCall(jdbcTemplate);
+        this.deleteSnippetCall = createDeleteSnippetCall(jdbcTemplate);
+        this.updateSnippetCall = createUpdateSnippetCall(jdbcTemplate);
     }
 
     private static SimpleJdbcCall createCreateSnippetCall(JdbcTemplate template) {
@@ -97,6 +104,47 @@ public class DBSnippetRepository implements SnippetRepository {
                         new SqlOutParameter("P_SNIPPETS", Types.REF_CURSOR)
                 )
                 .returningResultSet("P_SNIPPETS", DBSnippetRepository::mapDetailedSnippetResultRow);
+    }
+
+    private static SimpleJdbcCall createGetSnippetCall(JdbcTemplate template) {
+        return new SimpleJdbcCall(template)
+                .withCatalogName("SNIPPET_PKG")
+                .withFunctionName("GET_SNIPPET")
+                .withoutProcedureColumnMetaDataAccess()
+                .useInParameterNames("P_ID")
+                .declareParameters(
+                        new SqlOutParameter("RESULT", Types.REF_CURSOR),
+                        new SqlParameter("P_ID", Types.NUMERIC)
+                )
+                .returningResultSet("RESULT", DBSnippetRepository::mapSnippetResultRow);
+    }
+
+    private static SimpleJdbcCall createDeleteSnippetCall(JdbcTemplate template) {
+        return new SimpleJdbcCall(template)
+                .withCatalogName("SNIPPET_PKG")
+                .withProcedureName("DELETE_SNIPPET")
+                .withoutProcedureColumnMetaDataAccess()
+                .useInParameterNames("P_ID")
+                .declareParameters(
+                        new SqlParameter("P_ID", Types.NUMERIC),
+                        new SqlOutParameter("P_SNIPPET", Types.REF_CURSOR)
+                )
+                .returningResultSet("P_SNIPPET", DBSnippetRepository::mapSnippetResultRow);
+    }
+
+    private static SimpleJdbcCall createUpdateSnippetCall(JdbcTemplate template) {
+        return new SimpleJdbcCall(template)
+                .withCatalogName("SNIPPET_PKG")
+                .withProcedureName("UPDATE_SNIPPET")
+                .withoutProcedureColumnMetaDataAccess()
+                .useInParameterNames("P_ID")
+                .declareParameters(
+                        new SqlParameter("P_ID", Types.NUMERIC),
+                        new SqlParameter("P_TITLE", Types.VARCHAR),
+                        new SqlParameter("P_DESCRIPTION", Types.VARCHAR),
+                        new SqlOutParameter("P_SNIPPET", Types.REF_CURSOR)
+                )
+                .returningResultSet("P_SNIPPET", DBSnippetRepository::mapSnippetResultRow);
     }
 
     private static Object mapSnippetResultRow(ResultSet rs, int rowNum) throws SQLException {
@@ -249,5 +297,73 @@ public class DBSnippetRepository implements SnippetRepository {
         Number totalCountNum = (Number) result.get("P_TOTAL_COUNT");
         Long totalCount = totalCountNum == null ? 0L : totalCountNum.longValue();
         return new SnippetSearchResult(snippets, totalCount);
+    }
+
+    @Override
+    public Snippet getSnippet(Long snippetId) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("P_ID", snippetId, Types.NUMERIC);
+
+        Map<String, Object> result;
+        try {
+            result = this.getSnippetCall.execute(params);
+        } catch (Exception e) {
+            if (e instanceof DataAccessException dae &&
+                    DBRepositoryUtils.getSqlErrorCode(dae) == DBErrorCodes.SNIPPET_NOT_FOUND.getCode()) {
+                throw new SnippetNotFoundException();
+            }
+            throw new SnippetRepositoryException("Failed to retrieve snippet by id", e);
+        }
+
+        List<Snippet> snippets = DBRepositoryUtils.getListFromResultObject(result.get("RESULT"), Snippet.class);
+        return snippets.isEmpty() ? null : snippets.get(0);
+    }
+
+    @Override
+    public Snippet deleteSnippet(Long snippetId) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("P_ID", snippetId, Types.NUMERIC);
+
+        Map<String, Object> result;
+        try {
+            result = this.deleteSnippetCall.execute(params);
+        } catch (DataAccessException e) {
+            switch (DBErrorCodes.fromCode(DBRepositoryUtils.getSqlErrorCode(e))) {
+                case SNIPPET_NOT_FOUND:
+                    throw new SnippetNotFoundException();
+                default:
+                    throw new SnippetRepositoryException("Failed to delete snippet", e);
+            }
+        } catch (Exception e) {
+            throw new SnippetRepositoryException("Failed to delete snippet", e);
+        }
+
+        List<Snippet> snippets = DBRepositoryUtils.getListFromResultObject(result.get("P_SNIPPET"), Snippet.class);
+        return snippets.isEmpty() ? null : snippets.get(0);
+    }
+
+    @Override
+    public Snippet updateSnippet(Long snippetId, String title, String description) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("P_ID", snippetId, Types.NUMERIC)
+                .addValue("P_TITLE", title, Types.VARCHAR)
+                .addValue("P_DESCRIPTION", description, Types.VARCHAR);
+
+        Map<String, Object> result;
+        try {
+            result = this.updateSnippetCall.execute(params);
+        } catch (DataAccessException e) {
+            switch (DBErrorCodes.fromCode(DBRepositoryUtils.getSqlErrorCode(e))) {
+                case SNIPPET_NOT_FOUND:
+                    throw new SnippetNotFoundException();
+                default:
+                    throw new SnippetRepositoryException("Failed to update snippet", e);
+            }
+        } catch (Exception e) {
+            throw new SnippetRepositoryException("Failed to update snippet", e);
+        }
+
+        List<Snippet> snippets = DBRepositoryUtils.getListFromResultObject(result.get("P_SNIPPET"), Snippet.class);
+        return snippets.isEmpty() ? null : snippets.get(0);
     }
 }

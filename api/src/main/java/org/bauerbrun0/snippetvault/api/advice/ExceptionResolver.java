@@ -93,6 +93,12 @@ public class ExceptionResolver {
         return new ErrorResponse("Tag is not on snippet");
     }
 
+    @ExceptionHandler(SnippetNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleSnippetNotFoundException(SnippetNotFoundException e) {
+        return new ErrorResponse("Snippet not found");
+    }
+
     @ExceptionHandler(ExpiredJwtException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleExpiredToken(ExpiredJwtException e) {

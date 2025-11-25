@@ -38,7 +38,7 @@ public class DBTagRepository implements TagRepository {
 
     private static SimpleJdbcCall createCreateTagCall(JdbcTemplate template) {
         return new SimpleJdbcCall(template)
-                .withCatalogName("SNIPPET_PKG")
+                .withCatalogName("TAG_PKG")
                 .withProcedureName("CREATE_TAG")
                 .withoutProcedureColumnMetaDataAccess()
                 .useInParameterNames("P_USER_ID", "P_NAME", "P_COLOR")
@@ -53,7 +53,7 @@ public class DBTagRepository implements TagRepository {
 
     private static SimpleJdbcCall createUpdateTagCall(JdbcTemplate template) {
         return new SimpleJdbcCall(template)
-                .withCatalogName("SNIPPET_PKG")
+                .withCatalogName("TAG_PKG")
                 .withProcedureName("UPDATE_TAG")
                 .withoutProcedureColumnMetaDataAccess()
                 .useInParameterNames("P_ID", "P_NAME", "P_COLOR")
@@ -68,7 +68,7 @@ public class DBTagRepository implements TagRepository {
 
     private static SimpleJdbcCall createDeleteTagCall(JdbcTemplate template) {
         return new SimpleJdbcCall(template)
-                .withCatalogName("SNIPPET_PKG")
+                .withCatalogName("TAG_PKG")
                 .withProcedureName("DELETE_TAG")
                 .withoutProcedureColumnMetaDataAccess()
                 .useInParameterNames("P_ID")
@@ -81,7 +81,7 @@ public class DBTagRepository implements TagRepository {
 
     private static SimpleJdbcCall createGetTagCall(JdbcTemplate template) {
         return new SimpleJdbcCall(template)
-                .withCatalogName("SNIPPET_PKG")
+                .withCatalogName("TAG_PKG")
                 .withFunctionName("GET_TAG")
                 .withoutProcedureColumnMetaDataAccess()
                 .useInParameterNames("P_ID")
@@ -94,7 +94,7 @@ public class DBTagRepository implements TagRepository {
 
     private static SimpleJdbcCall createGetTagsCall(JdbcTemplate template) {
         return new SimpleJdbcCall(template)
-                .withCatalogName("SNIPPET_PKG")
+                .withCatalogName("TAG_PKG")
                 .withFunctionName("GET_TAGS")
                 .withoutProcedureColumnMetaDataAccess()
                 .useInParameterNames("P_USER_ID")

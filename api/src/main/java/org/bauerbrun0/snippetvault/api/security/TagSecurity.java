@@ -1,6 +1,5 @@
 package org.bauerbrun0.snippetvault.api.security;
 
-import lombok.extern.slf4j.Slf4j;
 import org.bauerbrun0.snippetvault.api.model.Tag;
 import org.bauerbrun0.snippetvault.api.service.TagService;
 import org.springframework.security.core.Authentication;
@@ -17,6 +16,9 @@ public class TagSecurity {
     public boolean isOwner(Authentication authentication, Long tagId) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Tag tag = tagService.getTag(tagId);
+        if (tag == null) {
+            return true;
+        }
         return tag.getUserId().equals(userDetails.getId());
     }
 }

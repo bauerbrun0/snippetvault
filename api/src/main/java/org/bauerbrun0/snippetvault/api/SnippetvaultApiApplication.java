@@ -68,5 +68,21 @@ public class SnippetvaultApiApplication implements CommandLineRunner {
 
         var result = this.snippetService.getPaginatedSnippets(1L, null, null, null, 1L, 3L);
         log.info("Result is {}", result);
+
+        Snippet getSnippet = this.snippetService.getSnippet(snippet.getId());
+        log.info("Get snippet {}", getSnippet);
+
+        Snippet updatedSnippet = this.snippetService.updateSnippet(getSnippet.getId(), "newtitle", "new desc");
+        log.info("Updated snippet {}", updatedSnippet);
+
+        Snippet snippetToDelete = this.snippetService.create(1L, "Delete this", "asdddd");
+
+        var result2 = this.snippetService.getPaginatedSnippets(1L, "Delete this", null, null, 1L, 3L);
+        log.info("Result2 is {}", result2);
+
+        this.snippetService.deleteSnippet(snippetToDelete.getId());
+
+        var result3 = this.snippetService.getPaginatedSnippets(1L, "Delete this", null, null, 1L, 3L);
+        log.info("Result3 is {}", result3);
     }
 }

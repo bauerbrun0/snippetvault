@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.bauerbrun0.snippetvault.api.dto.CreateSnippetRequest;
 import org.bauerbrun0.snippetvault.api.dto.SearchSnippetsRequest;
+import org.bauerbrun0.snippetvault.api.dto.UpdateSnippetRequest;
 import org.bauerbrun0.snippetvault.api.model.Snippet;
 import org.bauerbrun0.snippetvault.api.model.SnippetSearchResult;
 import org.bauerbrun0.snippetvault.api.security.CustomUserDetails;
@@ -52,10 +53,38 @@ public class SnippetController {
         return result;
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("@snippetSecurity.isOwner(authentication, #id)")
+    public Snippet getSnippet(
+            @P("id") @PathVariable("id") Long id
+    ) {
+        return this.snippetService.getSnippet(id);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@snippetSecurity.isOwner(authentication, #id)")
+    public Snippet deleteSnippet(
+            @P("id") @PathVariable("id") Long id
+    ) {
+        return this.snippetService.deleteSnippet(id);
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("@snippetSecurity.isOwner(authentication, #id)")
+    public Snippet updateSnippet(
+            @P("id") @PathVariable("id") Long id,
+            @Valid @RequestBody UpdateSnippetRequest updateRequest
+    ) {
+        return this.snippetService.updateSnippet(
+                id,
+                updateRequest.getTitle(),
+                updateRequest.getDescription()
+        );
+    }
+
     @PostMapping("/{id}/tags/{tagId}")
-    @PreAuthorize("@tagSecurity.isOwner(authentication, #tagId)") // TODO: check for snippet ownership too
+    @PreAuthorize("@snippetSecurity.isOwner(authentication, #id) && @tagSecurity.isOwner(authentication, #tagId)")
     public void addTagToSnippet(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
             @P("id") @PathVariable("id") Long id,
             @P("tagId") @PathVariable("tagId") Long tagId
     ) {
@@ -63,9 +92,8 @@ public class SnippetController {
     }
 
     @DeleteMapping("/{id}/tags/{tagId}")
-    @PreAuthorize("@tagSecurity.isOwner(authentication, #tagId)") // TODO: check for snippet ownership too
+    @PreAuthorize("@snippetSecurity.isOwner(authentication, #id) && @tagSecurity.isOwner(authentication, #tagId)")
     public void removeTagFromSnippet(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
             @P("id") @PathVariable("id") Long id,
             @P("tagId") @PathVariable("tagId") Long tagId
     ) {
