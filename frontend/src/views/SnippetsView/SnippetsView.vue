@@ -30,7 +30,7 @@ const selectedLanguages = ref([])
 const languages = ref<Language[]>([])
 
 const page = ref(0)
-const rows = ref(10)
+const rows = ref(5)
 const first = computed(() => page.value * rows.value)
 const totalRecords = ref(10)
 
