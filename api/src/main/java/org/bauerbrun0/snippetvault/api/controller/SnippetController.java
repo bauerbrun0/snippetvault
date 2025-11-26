@@ -6,6 +6,7 @@ import org.bauerbrun0.snippetvault.api.dto.*;
 import org.bauerbrun0.snippetvault.api.model.File;
 import org.bauerbrun0.snippetvault.api.model.Snippet;
 import org.bauerbrun0.snippetvault.api.model.SnippetSearchResult;
+import org.bauerbrun0.snippetvault.api.model.Tag;
 import org.bauerbrun0.snippetvault.api.security.CustomUserDetails;
 import org.bauerbrun0.snippetvault.api.service.SnippetService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -80,6 +81,14 @@ public class SnippetController {
                 updateRequest.getTitle(),
                 updateRequest.getDescription()
         );
+    }
+
+    @GetMapping("/{id}/tags")
+    @PreAuthorize("@snippetSecurity.isOwner(authentication, #id)")
+    public List<Tag> getTagsOfSnippet(
+            @P("id") @PathVariable("id") Long id
+    ) {
+        return this.snippetService.getTagsOfSnippet(id);
     }
 
     @PostMapping("/{id}/tags/{tagId}")

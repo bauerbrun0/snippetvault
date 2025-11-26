@@ -105,7 +105,7 @@ public class DBTagRepository implements TagRepository {
                 .returningResultSet("RESULT", DBTagRepository::mapTagResultRow);
     }
 
-    private static Object mapTagResultRow(ResultSet rs, int rowNum) throws SQLException {
+    public static Object mapTagResultRow(ResultSet rs, int rowNum) throws SQLException {
         Tag tag = new Tag();
         tag.setId(rs.getLong("ID"));
         tag.setUserId(rs.getLong("USER_ID"));

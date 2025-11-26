@@ -35,6 +35,7 @@ public class DBSnippetRepository implements SnippetRepository {
     private final SimpleJdbcCall getFilesCall;
     private final SimpleJdbcCall updateFileCall;
     private final SimpleJdbcCall deleteFileCall;
+    private final SimpleJdbcCall getTagsOfSnippetCall;
 
     public DBSnippetRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -49,6 +50,7 @@ public class DBSnippetRepository implements SnippetRepository {
         this.getFilesCall = createGetFilesCall(jdbcTemplate);
         this.updateFileCall = createUpdateFileCall(jdbcTemplate);
         this.deleteFileCall = createDeleteFileCall(jdbcTemplate);
+        this.getTagsOfSnippetCall = createGetTagsOfSnippetCall(jdbcTemplate);
     }
 
     private static SimpleJdbcCall createCreateSnippetCall(JdbcTemplate template) {
@@ -212,6 +214,19 @@ public class DBSnippetRepository implements SnippetRepository {
                 .returningResultSet("P_FILE", DBSnippetRepository::mapFileResultRow);
     }
 
+    private static SimpleJdbcCall createGetTagsOfSnippetCall(JdbcTemplate template) {
+        return new SimpleJdbcCall(template)
+                .withCatalogName("SNIPPET_PKG")
+                .withFunctionName("GET_TAGS_OF_SNIPPET")
+                .withoutProcedureColumnMetaDataAccess()
+                .useInParameterNames("P_SNIPPET_ID")
+                .declareParameters(
+                        new SqlOutParameter("RESULT", Types.REF_CURSOR),
+                        new SqlParameter("P_SNIPPET_ID", Types.NUMERIC)
+                )
+                .returningResultSet("RESULT", DBTagRepository::mapTagResultRow);
+    }
+
     private static Object mapSnippetResultRow(ResultSet rs, int rowNum) throws SQLException {
         Snippet snippet = new Snippet();
         snippet.setId(rs.getLong("ID"));
@@ -333,6 +348,19 @@ public class DBSnippetRepository implements SnippetRepository {
             }
         } catch (Exception e) {
             throw new SnippetRepositoryException("Failed to remove tag from snippet", e);
+        }
+    }
+
+    @Override
+    public List<Tag> getTagsOfSnippet(Long snippetId) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("P_SNIPPET_ID", snippetId, Types.NUMERIC);
+        Map<String, Object> result;
+        try {
+            result = this.getTagsOfSnippetCall.execute(params);
+            return DBRepositoryUtils.getListFromResultObject(result.get("RESULT"), Tag.class);
+        } catch (Exception e) {
+            throw new SnippetRepositoryException("Failed to retrieve tags of snippet", e);
         }
     }
 

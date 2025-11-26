@@ -3,6 +3,7 @@ package org.bauerbrun0.snippetvault.api.service;
 import org.bauerbrun0.snippetvault.api.model.File;
 import org.bauerbrun0.snippetvault.api.model.Snippet;
 import org.bauerbrun0.snippetvault.api.model.SnippetSearchResult;
+import org.bauerbrun0.snippetvault.api.model.Tag;
 import org.bauerbrun0.snippetvault.api.repository.SnippetRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,11 @@ public class SnippetService {
     @Transactional
     public void removeTagFromSnippet(Long snippetId, Long tagId) {
         this.snippetRepository.removeTagFromSnippet(snippetId, tagId);
+    }
+
+    @Transactional
+    public List<Tag> getTagsOfSnippet(Long snippetId) {
+        return this.snippetRepository.getTagsOfSnippet(snippetId);
     }
 
     @Transactional(readOnly = true)
