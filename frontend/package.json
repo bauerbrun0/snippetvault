@@ -19,6 +19,7 @@
     "@primeuix/themes": "^1.2.5",
     "@tailwindcss/vite": "^4.1.16",
     "@vueuse/core": "^14.0.0",
+    "color2k": "^2.0.3",
     "primeicons": "^7.0.0",
     "primevue": "^4.4.1",
     "tailwindcss": "^4.1.16",

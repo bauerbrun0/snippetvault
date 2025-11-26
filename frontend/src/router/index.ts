@@ -1,7 +1,7 @@
 import AdminView from '@/views/AdminView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ProfileView from '@/views/ProfileView.vue'
-import SnippetsView from '@/views/SnippetsView.vue'
+import SnippetsView from '@/views/SnippetsView/SnippetsView.vue'
 import TagsView from '@/views/TagsView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { userStore } from '@/stores/user'
