@@ -234,7 +234,7 @@ public class DBSnippetRepository implements SnippetRepository {
         snippet.setTitle(rs.getString("TITLE"));
         snippet.setDescription(rs.getString("DESCRIPTION"));
         snippet.setCreated(rs.getTimestamp("CREATED").toLocalDateTime());
-        snippet.setUpdated(rs.getTimestamp("CREATED").toLocalDateTime());
+        snippet.setUpdated(rs.getTimestamp("UPDATED").toLocalDateTime());
         return snippet;
     }
 
@@ -245,7 +245,7 @@ public class DBSnippetRepository implements SnippetRepository {
         snippet.setTitle(rs.getString("TITLE"));
         snippet.setDescription(rs.getString("DESCRIPTION"));
         snippet.setCreated(rs.getTimestamp("CREATED").toLocalDateTime());
-        snippet.setUpdated(rs.getTimestamp("CREATED").toLocalDateTime());
+        snippet.setUpdated(rs.getTimestamp("UPDATED").toLocalDateTime());
         snippet.setRelevance(rs.getLong("RELEVANCE"));
         snippet.setFileCount(rs.getLong("FILE_COUNT"));
 
