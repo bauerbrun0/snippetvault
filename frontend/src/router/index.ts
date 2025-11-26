@@ -2,6 +2,7 @@ import AdminView from '@/views/AdminView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import SnippetsView from '@/views/SnippetsView/SnippetsView.vue'
+import SnippetView from '@/views/SnippetView/SnippetView.vue'
 import TagsView from '@/views/TagsView/TagsView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { userStore } from '@/stores/user'
@@ -19,6 +20,11 @@ const router = createRouter({
       name: 'snippets',
       component: SnippetsView,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/snippets/:id',
+      name: 'snippet',
+      component: SnippetView,
     },
     {
       path: '/tags',
