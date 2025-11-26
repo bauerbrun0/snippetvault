@@ -161,7 +161,7 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
                        cast(collect( v.language_id ) AS number_array) AS language_ids,
                        cast(collect( v.tag_id ) AS number_array) AS tag_ids,
                        ROW_NUMBER() OVER (
-                            ORDER BY d.relevance, s.created DESC, d.id
+                            ORDER BY d.relevance, s.updated DESC, d.id
                         ) AS row_number
                 FROM deduplicated d
                 JOIN snippet s ON s.id = d.id
