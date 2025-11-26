@@ -212,6 +212,22 @@ BEGIN
 END;
 /
 
+CREATE OR REPLACE TRIGGER trg_snippet_tag_after_ins_del
+    AFTER INSERT OR DELETE ON snippet_tag
+    FOR EACH ROW
+BEGIN
+    IF INSERTING THEN
+        UPDATE snippet s
+        SET s.updated = SYSDATE
+        WHERE s.id = :NEW.snippet_id;
+
+    ELSIF DELETING THEN
+        UPDATE snippet s
+        SET s.updated = SYSDATE
+        WHERE s.id = :OLD.snippet_id;
+    END IF;
+END;
+/
 
 -------------
 -- Indexes --
