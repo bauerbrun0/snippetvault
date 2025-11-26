@@ -50,7 +50,6 @@ public class SnippetController {
                 searchRequest.getPageNumber(),
                 searchRequest.getPageSize()
         );
-        log.info("Found {}", result);
         return result;
     }
 
