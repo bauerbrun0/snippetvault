@@ -41,8 +41,11 @@ const languageMap = computed(() => {
               :key="tagId"
               class="text-sm rounded-md px-2 py-1"
               :style="{
-                backgroundColor: tagMap[tagId]?.color,
-                color: getLuminance(tagMap[tagId]?.color as string) > 0.5 ? 'black' : 'white',
+                backgroundColor: tagMap[tagId]?.color ? tagMap[tagId]?.color : '#ffffff',
+                color:
+                  getLuminance(tagMap[tagId]?.color ? tagMap[tagId]?.color : '#ffffff') > 0.5
+                    ? 'black'
+                    : 'white',
               }"
             >
               {{ tagMap[tagId]?.name }}
