@@ -329,6 +329,21 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
         END IF;
     END;
 
+    FUNCTION get_tags_of_snippet(p_snippet_id IN NUMBER) RETURN SYS_REFCURSOR AS
+        v_tags SYS_REFCURSOR;
+    BEGIN
+        OPEN v_tags FOR
+            SELECT t.id,
+                    t.name,
+                    t.user_id,
+                    t.color,
+                    t.created
+            FROM tag t
+            JOIN snippet_tag st ON st.tag_id = t.id
+            WHERE st.snippet_id = p_snippet_id;
+        RETURN v_tags;
+    END get_tags_of_snippet;
+
     PROCEDURE create_file(
         p_snippet_id IN NUMBER,
         p_filename IN VARCHAR2,

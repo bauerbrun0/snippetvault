@@ -32,6 +32,7 @@ CREATE OR REPLACE PACKAGE snippet_pkg AS
     );
     PROCEDURE add_tag_to_snippet(p_snippet_id IN NUMBER, p_tag_id IN NUMBER);
     PROCEDURE remove_tag_from_snippet(p_snippet_id IN NUMBER, p_tag_id IN NUMBER);
+    FUNCTION get_tags_of_snippet(p_snippet_id IN NUMBER) RETURN SYS_REFCURSOR;
     PROCEDURE create_file(
         p_snippet_id IN NUMBER,
         p_filename IN VARCHAR2,
