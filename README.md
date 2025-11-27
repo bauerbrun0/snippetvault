@@ -57,6 +57,9 @@ Then run:
 ```bash
 docker compose up -d
 ```
+
+To access the application, open your browser and navigate to `http://localhost:8081`.
+
 ## Development
 
 ### Start db
