@@ -56,6 +56,15 @@ watch(language, (newLang) => {
     })
   }
 })
+
+watch(content, (newContent) => {
+  if (editor) {
+    editor.setOptions({
+      value: newContent,
+      language: language.value?.name,
+    })
+  }
+})
 </script>
 
 <template>
