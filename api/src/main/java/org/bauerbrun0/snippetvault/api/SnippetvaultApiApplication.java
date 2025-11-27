@@ -4,10 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bauerbrun0.snippetvault.api.config.AppProperties;
 import org.bauerbrun0.snippetvault.api.exception.DuplicateUsernameException;
 import org.bauerbrun0.snippetvault.api.model.Role;
-import org.bauerbrun0.snippetvault.api.model.Snippet;
-import org.bauerbrun0.snippetvault.api.model.Tag;
-import org.bauerbrun0.snippetvault.api.service.SnippetService;
-import org.bauerbrun0.snippetvault.api.service.TagService;
 import org.bauerbrun0.snippetvault.api.service.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -19,17 +15,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SnippetvaultApiApplication implements CommandLineRunner {
 
     private final UserService userService;
-    private final SnippetService snippetService;
-    private final TagService tagService;
     private final PasswordEncoder passwordEncoder;
     private final AppProperties appProperties;
 
     public SnippetvaultApiApplication(
-            UserService userService, SnippetService snippetService, TagService tagService, PasswordEncoder passwordEncoder, AppProperties appProperties
+            UserService userService, PasswordEncoder passwordEncoder, AppProperties appProperties
     ) {
         this.userService = userService;
-        this.snippetService = snippetService;
-        this.tagService = tagService;
         this.passwordEncoder = passwordEncoder;
         this.appProperties = appProperties;
     }
@@ -41,7 +33,6 @@ public class SnippetvaultApiApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
         this.createDefaultUser();
-        this.createDummyData();
     }
 
     private void createDefaultUser() {
@@ -55,34 +46,4 @@ public class SnippetvaultApiApplication implements CommandLineRunner {
         }
     }
 
-    // TODO: later delete, just for development
-    private void createDummyData() {
-        Snippet snippet = this.snippetService.create(1L, "First Snippet", "ASDASD");
-        log.info("Created snippet {}", snippet);
-
-        Tag tag = this.tagService.createTag(1L, "First Tag", "#ffffff");
-        log.info("Created tag {}", tag);
-
-        this.snippetService.addTagToSnippet(snippet.getId(), tag.getId());
-        log.info("Added tag {} to snippet {}", tag.getId(), snippet.getId());
-
-        var result = this.snippetService.getPaginatedSnippets(1L, null, null, null, 1L, 3L);
-        log.info("Result is {}", result);
-
-        Snippet getSnippet = this.snippetService.getSnippet(snippet.getId());
-        log.info("Get snippet {}", getSnippet);
-
-        Snippet updatedSnippet = this.snippetService.updateSnippet(getSnippet.getId(), "newtitle", "new desc");
-        log.info("Updated snippet {}", updatedSnippet);
-
-        Snippet snippetToDelete = this.snippetService.create(1L, "Delete this", "asdddd");
-
-        var result2 = this.snippetService.getPaginatedSnippets(1L, "Delete this", null, null, 1L, 3L);
-        log.info("Result2 is {}", result2);
-
-        this.snippetService.deleteSnippet(snippetToDelete.getId());
-
-        var result3 = this.snippetService.getPaginatedSnippets(1L, "Delete this", null, null, 1L, 3L);
-        log.info("Result3 is {}", result3);
-    }
 }
