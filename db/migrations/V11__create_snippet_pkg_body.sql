@@ -158,8 +158,8 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
                        s.created,
                        s.updated,
                        count(DISTINCT v.file_id) AS file_count,
-                       cast(collect( v.language_id ) AS number_array) AS language_ids,
-                       cast(collect( v.tag_id ) AS number_array) AS tag_ids,
+                       set(cast(collect( v.language_id ) AS number_array)) AS language_ids,
+                       set(cast(collect( v.tag_id ) AS number_array)) AS tag_ids,
                        ROW_NUMBER() OVER (
                             ORDER BY d.relevance, s.updated DESC, d.id
                         ) AS row_number
