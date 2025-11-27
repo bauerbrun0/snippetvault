@@ -18,7 +18,6 @@ import { isResponseError } from 'up-fetch'
 import { useToast } from 'primevue/usetoast'
 import { errorSchema } from '@/utils/zod'
 import SnippetCard from './components/SnippetCard.vue'
-import Divider from 'primevue/divider'
 
 useTitle('SnippetVault')
 
