@@ -10,6 +10,7 @@
         "color2k": "^2.0.3",
         "primeicons": "^7.0.0",
         "primevue": "^4.4.1",
+        "prism-code-editor": "^4.1.0",
         "tailwindcss": "^4.1.16",
         "tailwindcss-primeui": "^0.6.1",
         "up-fetch": "^2.5.0",
@@ -659,6 +660,8 @@
     "primeicons": ["primeicons@7.0.0", "", {}, "sha512-jK3Et9UzwzTsd6tzl2RmwrVY/b8raJ3QZLzoDACj+oTJ0oX7L9Hy+XnVwgo4QVKlKpnP/Ur13SXV/pVh4LzaDw=="],
 
     "primevue": ["primevue@4.4.1", "", { "dependencies": { "@primeuix/styled": "^0.7.4", "@primeuix/styles": "^1.2.5", "@primeuix/utils": "^0.6.1", "@primevue/core": "4.4.1", "@primevue/icons": "4.4.1" } }, "sha512-JbHBa5k30pZ7mn/z4vYBOnyt5GrR15eM3X0wa3VanonxnFLYkTEx8OMh33aU6ndWeOfi7Ef57dOL3bTH+3f4hQ=="],
+
+    "prism-code-editor": ["prism-code-editor@4.1.0", "", {}, "sha512-T9EtoIooX0Xoxlrhmp0m1ahzTV0dyAsgPCoTjt2K3+labG/OuKcAchpoGQu2Zuncx8jcrBQVznchAhfdpJLKwA=="],
 
     "punycode": ["punycode@2.3.1", "", {}, "sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg=="],
 

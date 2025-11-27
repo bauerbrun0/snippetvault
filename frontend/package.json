@@ -22,6 +22,7 @@
     "color2k": "^2.0.3",
     "primeicons": "^7.0.0",
     "primevue": "^4.4.1",
+    "prism-code-editor": "^4.1.0",
     "tailwindcss": "^4.1.16",
     "tailwindcss-primeui": "^0.6.1",
     "up-fetch": "^2.5.0",

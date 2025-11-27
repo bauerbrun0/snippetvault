@@ -5,10 +5,10 @@ import Button from 'primevue/button'
 import Select from 'primevue/select'
 import type { Language } from '@/types/language'
 import { ref, computed } from 'vue'
-import Textarea from 'primevue/textarea'
 import FloatLabel from 'primevue/floatlabel'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
+import CodeEditor from './CodeEditor.vue'
 import { deleteFileFromSnippet, updateFileInSnippet } from '@/api/snippet'
 import { isResponseError } from 'up-fetch'
 import { useToast } from 'primevue/usetoast'
@@ -158,18 +158,7 @@ async function saveChanges() {
       </div>
     </template>
     <div>
-      <FloatLabel variant="in">
-        <Textarea
-          v-model="content"
-          :inputId="'file-content-' + file.id"
-          variant="filled"
-          fluid
-          :feedback="false"
-          rows="5"
-          cols="30"
-        />
-        <label :for="'file-content-' + file.id">Content</label>
-      </FloatLabel>
+      <CodeEditor :fileId="file.id" v-model:content="content" :language="language" />
     </div>
   </Panel>
 
