@@ -4,6 +4,10 @@ FLAG_FILE="/u01/app/oracle/oradata/db_initialized.flag"
 
 echo "Starting init.sh..."
 
+# Load credentials from env vars
+DB_USER="${DB_USER:-snippetvault}"
+DB_PASS="${DB_PASS:-secret}"
+
 # Exit if the DB is already initialized
 if [ -f "$FLAG_FILE" ]; then
     echo "Database already initialized. Skipping init."
@@ -13,21 +17,21 @@ fi
 
 # Run the SQL commands
 sqlplus -s sys/oracle as sysdba <<SQL
-CREATE USER snippetvault
-IDENTIFIED BY secret
+CREATE USER $DB_USER
+IDENTIFIED BY "$DB_PASS"
 DEFAULT TABLESPACE USERS
 QUOTA UNLIMITED ON USERS;
 
-GRANT CREATE SESSION TO snippetvault;
-GRANT CREATE TABLE TO snippetvault;
-GRANT CREATE VIEW TO snippetvault;
-GRANT CREATE SEQUENCE TO snippetvault;
-GRANT CREATE PROCEDURE TO snippetvault;
-GRANT CREATE TRIGGER TO snippetvault;
-GRANT CREATE TYPE TO snippetvault;
-GRANT EXECUTE ON CTXSYS.CTX_DDL TO snippetvault;
-GRANT EXECUTE ON CTXSYS.CTX_CLS TO snippetvault;
-GRANT EXECUTE ON CTXSYS.CTX_OUTPUT TO snippetvault;
+GRANT CREATE SESSION TO $DB_USER;
+GRANT CREATE TABLE TO $DB_USER;
+GRANT CREATE VIEW TO $DB_USER;
+GRANT CREATE SEQUENCE TO $DB_USER;
+GRANT CREATE PROCEDURE TO $DB_USER;
+GRANT CREATE TRIGGER TO $DB_USER;
+GRANT CREATE TYPE TO $DB_USER;
+GRANT EXECUTE ON CTXSYS.CTX_DDL TO $DB_USER;
+GRANT EXECUTE ON CTXSYS.CTX_CLS TO $DB_USER;
+GRANT EXECUTE ON CTXSYS.CTX_OUTPUT TO $DB_USER;
 SQL
 
 # Create the flag file to indicate initialization is done
