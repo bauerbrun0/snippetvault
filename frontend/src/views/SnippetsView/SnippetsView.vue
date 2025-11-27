@@ -18,6 +18,7 @@ import { isResponseError } from 'up-fetch'
 import { useToast } from 'primevue/usetoast'
 import { errorSchema } from '@/utils/zod'
 import SnippetCard from './components/SnippetCard.vue'
+import Divider from 'primevue/divider'
 
 useTitle('SnippetVault')
 
@@ -196,7 +197,8 @@ async function onCreateSnippet() {
     </div>
   </div>
   <div class="my-8">
-    <div v-if="loadingSnippets" class="text-center">Loading snippets...</div>
+    <div v-if="loadingSnippets" class="text-center my-10">Loading snippets...</div>
+    <div v-else-if="totalRecords === 0" class="text-center my-10">No snippets found.</div>
     <SnippetCard
       v-else
       v-for="snippet in snippets"
@@ -206,6 +208,7 @@ async function onCreateSnippet() {
       :languages="languages"
     />
     <Paginator
+      v-if="totalRecords > 0"
       :rows="5"
       :first="first"
       :totalRecords="totalRecords"
