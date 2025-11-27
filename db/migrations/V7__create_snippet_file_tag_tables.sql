@@ -213,20 +213,31 @@ END;
 /
 
 CREATE OR REPLACE TRIGGER trg_snippet_tag_after_ins_del
-    AFTER INSERT OR DELETE ON snippet_tag
-    FOR EACH ROW
+    FOR INSERT OR DELETE ON snippet_tag
+    COMPOUND TRIGGER
+    ids number_array := number_array();
+AFTER EACH ROW IS
 BEGIN
     IF INSERTING THEN
-        UPDATE snippet s
-        SET s.updated = SYSDATE
-        WHERE s.id = :NEW.snippet_id;
-
+        ids.EXTEND;
+        ids(ids.LAST) := :NEW.snippet_id;
     ELSIF DELETING THEN
-        UPDATE snippet s
-        SET s.updated = SYSDATE
-        WHERE s.id = :OLD.snippet_id;
+        ids.EXTEND;
+        ids(ids.LAST) := :OLD.snippet_id;
     END IF;
-END;
+END AFTER EACH ROW;
+
+AFTER STATEMENT IS
+BEGIN
+    -- remove duplicates
+    ids := set(ids);
+
+    UPDATE snippet
+    SET updated = SYSDATE
+    WHERE id IN (SELECT COLUMN_VALUE FROM TABLE(ids));
+
+END AFTER STATEMENT;
+END trg_snippet_tag_after_ins_del;
 /
 
 -------------
