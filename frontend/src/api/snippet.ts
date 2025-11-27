@@ -158,13 +158,13 @@ export async function fetchFilesForSnippet(snippetId: number): Promise<File[]> {
 
 export async function createFileForSnippet(
   snippetId: number,
-  filename: string,
+  fileName: string,
   content: string,
   languageId: number,
 ): Promise<File> {
   const result = await upfetch(`/snippets/${snippetId}/files`, {
     method: 'POST',
-    body: { filename, content, languageId },
+    body: { fileName, content, languageId },
     schema: z.object({
       id: z.number(),
       snippetId: z.number(),

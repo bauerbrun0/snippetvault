@@ -6,6 +6,7 @@ import Dialog from 'primevue/dialog'
 import Textarea from 'primevue/textarea'
 import InputText from 'primevue/inputtext'
 import MultiSelect from 'primevue/multiselect'
+import Select from 'primevue/select'
 import { useTitle } from '@vueuse/core'
 import type { Tag } from '@/types/tag'
 import type { Language } from '@/types/language'
@@ -22,8 +23,12 @@ import {
   fetchTagsForSnippet,
   addTagToSnippet,
   removeTagFromSnippet,
+  fetchFilesForSnippet,
+  createFileForSnippet,
 } from '@/api/snippet'
 import { useRoute, useRouter } from 'vue-router'
+import type { File } from '@/types/file'
+import FileCard from './components/FileCard.vue'
 
 useTitle('Snippet | SnippetVault')
 
@@ -64,16 +69,25 @@ const hasChanges = computed(() => {
 
 const editTitleDialogVisible = ref(false)
 const deleteSnippetDialogVisible = ref(false)
+const addFileDialogVisible = ref(false)
+
+const newFileFilename = ref('')
+const newFileLanguage = ref<Language>(null as unknown as Language)
 
 const tags = ref<Tag[]>([])
 const languages = ref<Language[]>([])
 
+const files = ref<File[]>([])
+
 onMounted(() => {
-  loadTags()
-  loadSnippet()
-  loadLanguages()
-  loadTagsForSnippet()
+  loadData()
 })
+
+async function loadData() {
+  await Promise.all([loadTags(), loadLanguages()])
+
+  await Promise.all([loadSnippet(), loadTagsForSnippet(), loadFilesForSnippet()])
+}
 
 async function loadTags() {
   try {
@@ -99,6 +113,9 @@ async function loadLanguages() {
   try {
     const languagesResponse = await fetchLanguages()
     languages.value = languagesResponse
+    newFileLanguage.value = languagesResponse[0]
+      ? languagesResponse[0]
+      : (null as unknown as Language)
   } catch (error) {
     let toastMessage = 'Failed to fetch languages.'
     if (!isResponseError(error)) {
@@ -145,6 +162,26 @@ async function loadSnippet() {
     useTitle(`${snippetResponse.title} | SnippetVault`)
   } catch (error) {
     let toastMessage = 'Failed to fetch snippet.'
+    if (!isResponseError(error)) {
+      toast.add({ severity: 'error', summary: 'Error', detail: toastMessage, life: 3000 })
+      return
+    }
+
+    const errorResponse = errorSchema.safeParse(error.data)
+    if (errorResponse.success) {
+      toastMessage = errorResponse.data.error
+    }
+
+    toast.add({ severity: 'error', summary: 'Error', detail: toastMessage, life: 3000 })
+  }
+}
+
+async function loadFilesForSnippet() {
+  try {
+    const filesResponse = await fetchFilesForSnippet(snippetId)
+    files.value = filesResponse
+  } catch (error) {
+    let toastMessage = 'Failed to fetch files for snippet.'
     if (!isResponseError(error)) {
       toast.add({ severity: 'error', summary: 'Error', detail: toastMessage, life: 3000 })
       return
@@ -261,6 +298,39 @@ async function onSaveChanges() {
     toast.add({ severity: 'success', summary: 'Success', detail: 'Tags updated.', life: 3000 })
   }
 }
+
+async function onAddFile() {
+  try {
+    await createFileForSnippet(
+      snippetId,
+      newFileFilename.value,
+      'print("Hello, World!")',
+      newFileLanguage.value.id,
+    )
+    toast.add({ severity: 'success', summary: 'Success', detail: 'File added.', life: 3000 })
+    newFileFilename.value = ''
+    newFileLanguage.value = languages.value[0] ? languages.value[0] : (null as unknown as Language)
+    addFileDialogVisible.value = false
+    loadFilesForSnippet()
+  } catch (error) {
+    let toastMessage = 'Failed to add file to snippet.'
+    if (!isResponseError(error)) {
+      toast.add({ severity: 'error', summary: 'Error', detail: toastMessage, life: 3000 })
+      return
+    }
+
+    const errorResponse = errorSchema.safeParse(error.data)
+    if (errorResponse.success) {
+      toastMessage = errorResponse.data.error
+    }
+
+    toast.add({ severity: 'error', summary: 'Error', detail: toastMessage, life: 3000 })
+  }
+}
+
+async function onAfterUpdateFile() {
+  await loadFilesForSnippet()
+}
 </script>
 
 <template>
@@ -314,6 +384,21 @@ async function onSaveChanges() {
         </FloatLabel>
       </div>
     </div>
+    <div class="w-full flex justify-between items-center">
+      <h2 class="text-3xl font-semibold my-6">Files</h2>
+      <Button label="Add File" class="mb-4" @click="addFileDialogVisible = true" />
+    </div>
+    <div v-if="files.length === 0" class="text-center">No files attached to this snippet.</div>
+    <FileCard
+      v-for="file in files"
+      :key="file.id"
+      :file="file"
+      :languages="languages"
+      :collapsed="file.id !== files[0]?.id"
+      :snippetId="snippetId"
+      :onAfterUpdate="onAfterUpdateFile"
+      :onAfterDelete="onAfterUpdateFile"
+    />
   </div>
 
   <Dialog
@@ -365,6 +450,50 @@ async function onSaveChanges() {
         class="p-button-md p-button-danger"
         @click="onDeleteSnippet"
       ></Button>
+    </div>
+  </Dialog>
+
+  <Dialog
+    v-model:visible="addFileDialogVisible"
+    modal
+    header="Add File"
+    :style="{ width: '35rem' }"
+  >
+    <div class="flex items-center gap-4 mb-4">
+      <FloatLabel variant="in">
+        <InputText
+          v-model="newFileFilename"
+          inputId="filename"
+          variant="filled"
+          fluid
+          :feedback="false"
+        />
+        <label for="filename">File Name</label>
+      </FloatLabel>
+    </div>
+    <div class="flex items-center gap-4 mb-4">
+      <FloatLabel class="w-full" variant="in">
+        <Select
+          v-model="newFileLanguage"
+          inputId="new-file-language"
+          :options="languages"
+          optionLabel="name"
+          class="w-full"
+          variant="filled"
+          :feedback="false"
+          filter
+        />
+        <label for="new-file-language">Language</label>
+      </FloatLabel>
+    </div>
+    <div class="flex justify-end gap-2">
+      <Button
+        type="button"
+        label="Cancel"
+        severity="secondary"
+        @click="addFileDialogVisible = false"
+      ></Button>
+      <Button type="button" label="Add file" @click="onAddFile"></Button>
     </div>
   </Dialog>
 </template>

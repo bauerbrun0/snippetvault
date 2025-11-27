@@ -13,3 +13,10 @@ Start db
 ```bash
 docker compose -f db/docker-compose.yaml up -d
 ```
+
+Build and run
+```bash
+# snippetvault/
+./api/mvnw clean install -DskipTests
+cd ./api
+./mvnw spring-boot:run
