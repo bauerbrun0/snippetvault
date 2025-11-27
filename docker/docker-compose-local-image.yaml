@@ -22,12 +22,20 @@ services:
       JWT_SECRET: ZXhhbXBsZS1zZWNyZXQta2V5LXRvLWJlLXJlcGxhY2VkLXdpdGgtYS1sb25nZXItYW5kLXNlY3VyZXItb25l
       JWT_EXPIRATION: 36000000
 
-      APP_FRONTEND: http://localhost:5173
-      APP_ADMIN_USER: admin
-      APP_ADMIN_PASSWORD: password
+      APP_FRONTEND: http://localhost:8081
+      APP_ADMINUSER: admin
+      APP_ADMINPASSWORD: password
     ports:
       - "8080:8080"
 
+  frontend:
+    image: snippetvault-frontend:latest
+    depends_on:
+        - api
+    environment:
+      VITE_API_BASE_URL: "http://localhost:8080/api"
+    ports:
+      - "8081:80"
 volumes:
   oracle_data:
     driver: local

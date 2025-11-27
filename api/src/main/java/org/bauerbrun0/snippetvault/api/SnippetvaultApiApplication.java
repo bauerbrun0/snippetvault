@@ -32,13 +32,14 @@ public class SnippetvaultApiApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        log.info("Frontend URL: {}", this.appProperties.getFrontend());
         this.createDefaultUser();
     }
 
     private void createDefaultUser() {
         try {
-            String username = this.appProperties.getAdminUser();
-            String password = this.appProperties.getAdminPassword();
+            String username = this.appProperties.getAdminuser();
+            String password = this.appProperties.getAdminpassword();
             this.userService.createUser(username, passwordEncoder.encode(password), new String[]{Role.USER, Role.ADMIN});
             log.info("Created default user {}", username);
         } catch (DuplicateUsernameException e) {

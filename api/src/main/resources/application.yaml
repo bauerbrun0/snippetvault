@@ -32,5 +32,5 @@ jwt:
 
 app:
   frontend: http://localhost:5173
-  admin-user: admin
-  admin-password: password
+  adminuser: admin
+  adminpassword: password
