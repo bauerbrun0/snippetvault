@@ -6,12 +6,16 @@ spring:
     url: jdbc:oracle:thin:@//localhost:1521/XE
     username: snippetvault
     password: secret
+    hikari:
+      initialization-fail-timeout: 0
 
   flyway:
     locations: classpath:db/migrations
     oracle:
       sqlplus: true
     mixed: true
+    connect-retries: 60
+    connect-retries-interval: 2s
 
   web:
     resources:

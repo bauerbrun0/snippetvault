@@ -1,0 +1,8 @@
+docker-compose-local-image.yaml
+docker-compose.yaml
+target
+.idea
+examples
+reset-db.sql
+README.md
+.gitignore

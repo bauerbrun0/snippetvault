@@ -1,0 +1,33 @@
+services:
+  oracle:
+    image: 'oracle-xe-snippetvault:latest'
+    environment:
+      - 'ORACLE_ALLOW_REMOTE=true'
+      - 'DB_USER=snippetvault'
+      - 'DB_PASS=secret'
+    volumes:
+      - 'oracle_data:/u01/app/oracle'
+    ports:
+      - '1521:1521'
+
+  api:
+    image: snippetvault-api:latest
+    depends_on:
+      - oracle
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@//oracle:1521/XE
+      SPRING_DATASOURCE_USERNAME: snippetvault
+      SPRING_DATASOURCE_PASSWORD: secret
+
+      JWT_SECRET: ZXhhbXBsZS1zZWNyZXQta2V5LXRvLWJlLXJlcGxhY2VkLXdpdGgtYS1sb25nZXItYW5kLXNlY3VyZXItb25l
+      JWT_EXPIRATION: 36000000
+
+      APP_FRONTEND: http://localhost:5173
+      APP_ADMIN_USER: admin
+      APP_ADMIN_PASSWORD: password
+    ports:
+      - "8080:8080"
+
+volumes:
+  oracle_data:
+    driver: local

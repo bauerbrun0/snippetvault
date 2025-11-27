@@ -20,3 +20,9 @@ Build and run
 ./api/mvnw clean install -DskipTests
 cd ./api
 ./mvnw spring-boot:run
+```
+
+Build the api docker image
+```bash
+docker build -f ./api/Dockerfile -t snippetvault-api:latest .
+```
