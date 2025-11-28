@@ -42,16 +42,16 @@ END;
 
 -- Package --
 
-CREATE OR REPLACE PACKAGE error_log_pkg IS
+CREATE OR REPLACE PACKAGE error_log_pkg AS
     PROCEDURE log_error(
-        error_message VARCHAR2,
-        value VARCHAR2,
-        api VARCHAR2
+        p_error_message VARCHAR2,
+        p_value VARCHAR2,
+        p_api VARCHAR2
     );
 END error_log_pkg;
 /
 
-CREATE OR REPLACE PACKAGE BODY error_log_pkg IS
+CREATE OR REPLACE PACKAGE BODY error_log_pkg AS
     PROCEDURE log_error(
         p_error_message VARCHAR2,
         p_value VARCHAR2,
