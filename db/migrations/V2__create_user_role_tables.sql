@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------
--- V1__create_user_role_tables.sql                                     --
+-- V2__create_user_role_tables.sql                                     --
 -------------------------------------------------------------------------
 -- Creates USER, ROLE, USER_ROLE tables with sequences,                --
 -- constraints and triggers                                            --

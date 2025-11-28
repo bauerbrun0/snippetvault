@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------
--- V7__create_snippet_file_tag_tables.sql                              --
+-- V8__create_snippet_file_tag_tables.sql                              --
 -------------------------------------------------------------------------
 -- Creates SNIPPET, FILE, LANGUAGE, TAG, TAG_SNIPPET                   --
 -- tables with sequences, constraints, triggers and indexes            --

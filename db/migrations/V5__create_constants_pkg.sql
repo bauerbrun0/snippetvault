@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------
--- V4__create_constants_pkg.sql                                        --
+-- V5__create_constants_pkg.sql                                        --
 -------------------------------------------------------------------------
 -- Creates constants package where constants                           --
 -- like error codes are stored                                         --

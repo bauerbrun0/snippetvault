@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------------------
--- V8__insert_languages.sql                                                           --
+-- V9__insert_languages.sql                                                           --
 ----------------------------------------------------------------------------------------
 -- Inserts languages supported by prism-code-editor                                   --
 -- https://github.com/jonpyt/prism-code-editor/tree/main/package/src/prism/languages  --

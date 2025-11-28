@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------
--- V15__create_file_content_index_sync_jobs.sql                          --
+-- V16__create_file_content_index_sync_jobs.sql                          --
 ---------------------------------------------------------------------------
 -- Creates two scheduled jobs:                                           --
 --                                                                       --

@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------
--- V16__create_tag_history_cleanup_job.sql                               --
+-- V17__create_tag_history_cleanup_job.sql                               --
 ---------------------------------------------------------------------------
 -- Creates a scheduled Oracle job that performs periodic cleanup of the  --
 -- tag_history table.                                                    --
