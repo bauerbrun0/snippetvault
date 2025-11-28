@@ -27,6 +27,10 @@ CREATE SEQUENCE tag_seq
     START WITH 1
     INCREMENT BY 1;
 
+CREATE SEQUENCE tag_history_seq
+    START WITH 1
+    INCREMENT BY 1;
+
 CREATE SEQUENCE snippet_tag_seq
     START WITH 1
     INCREMENT BY 1;
@@ -66,8 +70,17 @@ CREATE TABLE tag (
     name VARCHAR2(150 CHAR) NOT NULL,
     user_id NUMBER NOT NULL,
     color VARCHAR2(7 CHAR) NOT NULL,
-    created TIMESTAMP DEFAULT SYSDATE NOT NULL
+    created TIMESTAMP DEFAULT SYSDATE NOT NULL,
+    version NUMBER NOT NULL
 );
+
+CREATE TABLE tag_history AS
+    SELECT t.*,
+           cast(NULL AS NUMBER) AS history_id,
+           cast(NULL AS VARCHAR2(1)) AS history_action,
+           cast(NULL AS TIMESTAMP) AS history_timestamp
+    FROM tag t
+    WHERE 1=0;
 
 CREATE TABLE snippet_tag (
     id NUMBER,
@@ -112,6 +125,9 @@ ALTER TABLE tag
     ON DELETE CASCADE;
 ALTER TABLE tag ADD CONSTRAINT chk_tag_color
     CHECK (REGEXP_LIKE(color, '^#[0-9A-Fa-f]{6}$'));
+
+ALTER TABLE tag_history
+    ADD CONSTRAINT pk_tag_history PRIMARY KEY (history_id);
 
 ALTER TABLE snippet_tag
     ADD CONSTRAINT pk_snippet_tag PRIMARY KEY (id);
@@ -192,15 +208,59 @@ BEGIN
 END;
 /
 
-CREATE OR REPLACE TRIGGER trg_tag_before_insert
-    BEFORE INSERT ON tag
+CREATE OR REPLACE TRIGGER trg_tag_before_modify
+    BEFORE INSERT OR UPDATE OR DELETE ON tag
     FOR EACH ROW
 BEGIN
-    IF :NEW.id IS NULL THEN
-        SELECT tag_seq.nextval INTO :NEW.id FROM dual;
+    IF INSERTING THEN
+        IF :NEW.id IS NULL THEN
+            SELECT tag_seq.nextval INTO :NEW.id FROM dual;
+        END IF;
+        :NEW.version := 1;
+    ELSIF UPDATING THEN
+        :NEW.version := :OLD.version + 1;
     END IF;
 END;
 /
+
+CREATE OR REPLACE TRIGGER trg_tag_after_modify
+    AFTER INSERT OR UPDATE OR DELETE ON tag
+    FOR EACH ROW
+BEGIN
+    IF INSERTING THEN
+        INSERT INTO tag_history (
+            id, name, user_id, color, created, version,
+            history_id, history_action, history_timestamp
+        )
+        VALUES (
+                   :NEW.id, :NEW.name, :NEW.user_id, :NEW.color,
+                   :NEW.created, :NEW.version,
+                   tag_history_seq.NEXTVAL, 'I', SYSDATE
+               );
+    ELSIF UPDATING THEN
+        INSERT INTO tag_history (
+            id, name, user_id, color, created, version,
+            history_id, history_action, history_timestamp
+        )
+        VALUES (
+                   :OLD.id, :OLD.name, :OLD.user_id, :OLD.color,
+                   :OLD.created, :OLD.version,
+                   tag_history_seq.NEXTVAL, 'U', SYSDATE
+               );
+    ELSIF DELETING THEN
+        INSERT INTO tag_history (
+            id, name, user_id, color, created, version,
+            history_id, history_action, history_timestamp
+        )
+        VALUES (
+                   :OLD.id, :OLD.name, :OLD.user_id, :OLD.color,
+                   :OLD.created, :OLD.version,
+                   tag_history_seq.NEXTVAL, 'D', SYSDATE
+               );
+    END IF;
+END;
+/
+
 
 CREATE OR REPLACE TRIGGER trg_snippet_tag_before_insert
     BEFORE INSERT ON snippet_tag
