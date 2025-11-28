@@ -32,7 +32,19 @@ BEGIN
     DBMS_SCHEDULER.CREATE_JOB(
             job_name        => 'JOB_SYNC_IDX_FILE_CONTENT',
             job_type        => 'PLSQL_BLOCK',
-            job_action      => 'BEGIN CTX_DDL.SYNC_INDEX(''IDX_FILE_CONTENT''); END;',
+            job_action      => '
+                BEGIN
+                    CTX_DDL.SYNC_INDEX(''IDX_FILE_CONTENT'');
+                EXCEPTION
+                    WHEN OTHERS THEN
+                        error_log_pkg.log_error(
+                            p_error_message => SQLERRM,
+                            p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                            p_context => ''Syncing IDX_FILE_CONTENT'',
+                            p_value => ''N/A'',
+                            p_api => ''JOB_SYNC_IDX_FILE_CONTENT''
+                        );
+                END;',
             start_date      => SYSTIMESTAMP,
             repeat_interval => 'FREQ=MINUTELY; INTERVAL=1',
             enabled         => TRUE
@@ -41,7 +53,19 @@ BEGIN
     DBMS_SCHEDULER.CREATE_JOB(
             job_name        => 'JOB_OPTIMIZE_IDX_FILE_CONTENT',
             job_type        => 'PLSQL_BLOCK',
-            job_action      => 'BEGIN CTX_DDL.OPTIMIZE_INDEX(''IDX_FILE_CONTENT'', ''FULL''); END;',
+            job_action      => '
+                BEGIN
+                    CTX_DDL.OPTIMIZE_INDEX(''IDX_FILE_CONTENT'', ''FULL'');
+                EXCEPTION
+                    WHEN OTHERS THEN
+                        error_log_pkg.log_error(
+                            p_error_message => SQLERRM,
+                            p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                            p_context => ''Optimizing IDX_FILE_CONTENT'',
+                            p_value => ''N/A'',
+                            p_api => ''JOB_OPTIMIZE_IDX_FILE_CONTENT''
+                        );
+                END;',
             start_date      => SYSTIMESTAMP,
             repeat_interval => 'FREQ=DAILY; BYHOUR=3; BYMINUTE=0; BYSECOND=0',
             enabled         => TRUE

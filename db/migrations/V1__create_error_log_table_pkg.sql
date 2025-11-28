@@ -16,11 +16,13 @@ CREATE SEQUENCE error_log_seq
 
 CREATE TABLE error_log
 (
-    id            NUMBER,
-    time          TIMESTAMP DEFAULT SYSDATE,
-    error_message VARCHAR2(4000),
-    value         VARCHAR2(4000),
-    api           VARCHAR2(100)
+    id              NUMBER,
+    time            TIMESTAMP DEFAULT SYSDATE,
+    error_message   VARCHAR2(4000),
+    error_backtrace VARCHAR2(4000),
+    context         VARCHAR2(4000),
+    value           VARCHAR2(4000),
+    api             VARCHAR2(100)
 );
 
 -- Constraint --
@@ -31,7 +33,8 @@ ALTER TABLE error_log
 -- Trigger --
 
 CREATE OR REPLACE TRIGGER trg_error_log_before_insert
-    BEFORE INSERT ON error_log
+    BEFORE INSERT
+    ON error_log
     FOR EACH ROW
 BEGIN
     IF :NEW.id IS NULL THEN
@@ -45,6 +48,8 @@ END;
 CREATE OR REPLACE PACKAGE error_log_pkg AS
     PROCEDURE log_error(
         p_error_message VARCHAR2,
+        p_error_backtrace VARCHAR2,
+        p_context VARCHAR2,
         p_value VARCHAR2,
         p_api VARCHAR2
     );
@@ -54,13 +59,15 @@ END error_log_pkg;
 CREATE OR REPLACE PACKAGE BODY error_log_pkg AS
     PROCEDURE log_error(
         p_error_message VARCHAR2,
+        p_error_backtrace VARCHAR2,
+        p_context VARCHAR2,
         p_value VARCHAR2,
         p_api VARCHAR2
     ) IS
         PRAGMA AUTONOMOUS_TRANSACTION;
     BEGIN
-        INSERT INTO error_log (error_message, value, api)
-        VALUES (p_error_message, p_value, p_api);
+        INSERT INTO error_log (error_message, error_backtrace, context, value, api)
+        VALUES (p_error_message, p_error_backtrace, p_context, p_value, p_api);
         COMMIT;
     END log_error;
 END error_log_pkg;

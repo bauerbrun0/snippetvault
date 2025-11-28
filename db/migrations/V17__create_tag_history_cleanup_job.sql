@@ -23,6 +23,15 @@ BEGIN
                 DELETE FROM tag_history
                 WHERE history_timestamp < ADD_MONTHS(SYSDATE, -3);
                 COMMIT;
+            EXCEPTION
+                WHEN OTHERS THEN
+                    error_log_pkg.log_error(
+                        p_error_message => SQLERRM,
+                        p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                        p_context => ''Cleaning up tag_history'',
+                        p_value => ''N/A'',
+                        p_api => ''JOB_CLEANUP_TAG_HISTORY''
+                    );
             END;',
         start_date      => SYSTIMESTAMP,
         repeat_interval => 'FREQ=DAILY; BYHOUR=2',

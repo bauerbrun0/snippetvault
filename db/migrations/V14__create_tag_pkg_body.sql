@@ -33,15 +33,36 @@ CREATE OR REPLACE PACKAGE BODY tag_pkg AS
                 IF SQLERRM LIKE '%FK_SNIPPET_USER%' THEN
                     RAISE_APPLICATION_ERROR(constants_pkg.ERR_USER_NOT_FOUND, 'User not found');
                 ELSE
+                    error_log_pkg.log_error(
+                        p_error_message => SQLERRM,
+                        p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                        p_context => 'Creating tag for user',
+                        p_value => 'user_id=' || p_user_id || ', name=' || p_name || ', color=' || p_color,
+                        p_api => 'tag_pkg.create_tag'
+                    );
                     RAISE;
                 END IF;
             ELSIF SQLCODE = -2290 THEN
                 IF SQLERRM LIKE '%CHK_TAG_COLOR%' THEN
                     RAISE_APPLICATION_ERROR(constants_pkg.ERR_TAG_COLOR_INVALID, 'Tag color must be a valid hex code');
                 ELSE
+                    error_log_pkg.log_error(
+                            p_error_message => SQLERRM,
+                            p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                            p_context => 'Creating tag for user',
+                            p_value => 'user_id=' || p_user_id || ', name=' || p_name || ', color=' || p_color,
+                            p_api => 'tag_pkg.create_tag'
+                    );
                     RAISE;
                 END IF;
             ELSE
+                error_log_pkg.log_error(
+                        p_error_message => SQLERRM,
+                        p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                        p_context => 'Creating tag for user',
+                        p_value => 'user_id=' || p_user_id || ', name=' || p_name || ', color=' || p_color,
+                        p_api => 'tag_pkg.create_tag'
+                );
                 RAISE;
             END IF;
     END create_tag;
@@ -79,9 +100,23 @@ CREATE OR REPLACE PACKAGE BODY tag_pkg AS
                 IF SQLERRM LIKE '%CHK_TAG_COLOR%' THEN
                     RAISE_APPLICATION_ERROR(constants_pkg.ERR_TAG_COLOR_INVALID, 'Tag color must be a valid hex code');
                 ELSE
+                    error_log_pkg.log_error(
+                            p_error_message => SQLERRM,
+                            p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                            p_context => 'Updating tag',
+                            p_value => 'p_id=' || p_id || ', p_name=' || p_name || ', p_color=' || p_color,
+                            p_api => 'tag_pkg.update_tag'
+                    );
                     RAISE;
                 END IF;
             ELSE
+                error_log_pkg.log_error(
+                        p_error_message => SQLERRM,
+                        p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                        p_context => 'Updating tag',
+                        p_value => 'p_id=' || p_id || ', p_name=' || p_name || ', p_color=' || p_color,
+                        p_api => 'tag_pkg.update_tag'
+                );
                 RAISE;
             END IF;
     END update_tag;
