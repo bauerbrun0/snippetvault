@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------
--- V6__create_user_pkg_body.sql                                        --
+-- V7__create_user_pkg_body.sql                                        --
 -------------------------------------------------------------------------
 -- Creates the user package's body                                     --
 -------------------------------------------------------------------------
@@ -37,6 +37,8 @@ CREATE OR REPLACE PACKAGE BODY user_pkg AS
                             constants_pkg.ERR_ROLE_NOT_FOUND,
                             'Role "' || p_roles(i) || '" does not exist.'
                     );
+                WHEN OTHERS THEN
+                    RAISE;
             END;
 
             INSERT INTO user_role (user_id, role_id)
@@ -54,9 +56,23 @@ CREATE OR REPLACE PACKAGE BODY user_pkg AS
             IF SQLERRM LIKE '%UQ_USER_USERNAME%' THEN
                 RAISE_APPLICATION_ERROR(constants_pkg.ERR_DUPLICATE_USERNAME, 'Username already taken');
             ELSE
+                error_log_pkg.log_error(
+                        p_error_message => SQLERRM,
+                        p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                        p_context => 'Creating user',
+                        p_value => 'p_username=' || p_username,
+                        p_api => 'user_pkg.create_user'
+                );
                 RAISE;
             END IF;
         WHEN OTHERS THEN
+            error_log_pkg.log_error(
+                    p_error_message => SQLERRM,
+                    p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                    p_context => 'Creating user',
+                    p_value => 'p_username=' || p_username,
+                    p_api => 'user_pkg.create_user'
+            );
             RAISE;
     END create_user;
 
@@ -208,9 +224,23 @@ CREATE OR REPLACE PACKAGE BODY user_pkg AS
             IF SQLERRM LIKE '%UQ_USER_USERNAME%' THEN
                 RAISE_APPLICATION_ERROR(constants_pkg.ERR_DUPLICATE_USERNAME, 'Username already taken');
             ELSE
+                error_log_pkg.log_error(
+                        p_error_message => SQLERRM,
+                        p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                        p_context => 'Updating user',
+                        p_value => 'p_id=' || p_id || ', p_username=' || p_username,
+                        p_api => 'user_pkg.update_user'
+                );
                 RAISE;
             END IF;
         WHEN OTHERS THEN
+            error_log_pkg.log_error(
+                    p_error_message => SQLERRM,
+                    p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                    p_context => 'Updating user',
+                    p_value => 'p_id=' || p_id || ', p_username=' || p_username,
+                    p_api => 'user_pkg.update_user'
+            );
             RAISE;
     END update_user;
 

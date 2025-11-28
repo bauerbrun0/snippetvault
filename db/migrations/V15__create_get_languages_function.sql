@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------
--- V14__create_get_languages_function.sql                              --
+-- V15__create_get_languages_function.sql                              --
 -------------------------------------------------------------------------
 -- Creates the get_languages_function to query all                     --
 -- available languages                                                 --

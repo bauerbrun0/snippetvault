@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------
--- V11__create_snippet_pkg_body.sql                                    --
+-- V12__create_snippet_pkg_body.sql                                    --
 -------------------------------------------------------------------------
 -- Creates the snippet package's body                                  --
 -------------------------------------------------------------------------
@@ -48,9 +48,23 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
                 IF SQLERRM LIKE '%FK_SNIPPET_USER%' THEN
                     RAISE_APPLICATION_ERROR(constants_pkg.ERR_USER_NOT_FOUND, 'User not found');
                 ELSE
+                    error_log_pkg.log_error(
+                            p_error_message => SQLERRM,
+                            p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                            p_context => 'Creating snippet',
+                            p_value => 'p_user_id=' || p_user_id || ', p_title=' || p_title || ', p_description=' || p_description,
+                            p_api => 'snippet_pkg.create_snippet'
+                    );
                     RAISE;
                 END IF;
             ELSE
+                error_log_pkg.log_error(
+                        p_error_message => SQLERRM,
+                        p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                        p_context => 'Creating snippet',
+                        p_value => 'p_user_id=' || p_user_id || ', p_title=' || p_title || ', p_description=' || p_description,
+                        p_api => 'snippet_pkg.create_snippet'
+                );
                 RAISE;
             END IF;
     END create_snippet;
@@ -301,6 +315,13 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
             IF SQLERRM LIKE '%UQ_SNIPPET_TAG%' THEN
                 RAISE_APPLICATION_ERROR(constants_pkg.ERR_DUPLICATE_TAG_ON_SNIPPET, 'Tag already exists on snippet');
             ELSE
+                error_log_pkg.log_error(
+                        p_error_message => SQLERRM,
+                        p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                        p_context => 'Adding tag to snippet',
+                        p_value => 'p_snippet_id=' || p_snippet_id || ', p_tag_id=' || p_tag_id,
+                        p_api => 'snippet_pkg.add_tag_to_snippet'
+                );
                 RAISE;
             END IF;
         WHEN OTHERS THEN
@@ -310,9 +331,23 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
                 ELSIF SQLERRM LIKE '%FK_SNIPPET_TAG_TAG%' THEN
                     RAISE_APPLICATION_ERROR(constants_pkg.ERR_TAG_NOT_FOUND, 'Tag not found');
                 ELSE
+                    error_log_pkg.log_error(
+                            p_error_message => SQLERRM,
+                            p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                            p_context => 'Adding tag to snippet',
+                            p_value => 'p_snippet_id=' || p_snippet_id || ', p_tag_id=' || p_tag_id,
+                            p_api => 'snippet_pkg.add_tag_to_snippet'
+                    );
                     RAISE;
                 END IF;
             ELSE
+                error_log_pkg.log_error(
+                        p_error_message => SQLERRM,
+                        p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                        p_context => 'Adding tag to snippet',
+                        p_value => 'p_snippet_id=' || p_snippet_id || ', p_tag_id=' || p_tag_id,
+                        p_api => 'snippet_pkg.add_tag_to_snippet'
+                );
                 RAISE;
             END IF;
     END add_tag_to_snippet;
@@ -395,9 +430,23 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
                 ELSIF SQLERRM LIKE '%FK_FILE_LANGUAGE%' THEN
                     RAISE_APPLICATION_ERROR(constants_pkg.ERR_LANGUAGE_NOT_FOUND, 'Language not found');
                 ELSE
+                    error_log_pkg.log_error(
+                            p_error_message => SQLERRM,
+                            p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                            p_context => 'Creating file',
+                            p_value => 'p_snippet_id=' || p_snippet_id || ', p_filename=' || p_filename || ', p_language_id=' || p_language_id,
+                            p_api => 'snippet_pkg.create_file'
+                    );
                     RAISE;
                 END IF;
             ELSE
+                error_log_pkg.log_error(
+                        p_error_message => SQLERRM,
+                        p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                        p_context => 'Creating file',
+                        p_value => 'p_snippet_id=' || p_snippet_id || ', p_filename=' || p_filename || ', p_language_id=' || p_language_id,
+                        p_api => 'snippet_pkg.create_file'
+                );
                 RAISE;
             end if;
     END create_file;
@@ -474,9 +523,23 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
                 IF SQLERRM LIKE '%FK_FILE_LANGUAGE%' THEN
                     RAISE_APPLICATION_ERROR(constants_pkg.ERR_LANGUAGE_NOT_FOUND, 'Language not found');
                 ELSE
+                    error_log_pkg.log_error(
+                            p_error_message => SQLERRM,
+                            p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                            p_context => 'Updating file',
+                            p_value => 'p_id=' || p_id || ', p_snippet_id=' || p_snippet_id || ', p_language_id=' || p_language_id || ', p_filename=' || p_filename,
+                            p_api => 'snippet_pkg.update_file'
+                    );
                     RAISE;
                 END IF;
             ELSE
+                error_log_pkg.log_error(
+                        p_error_message => SQLERRM,
+                        p_error_backtrace => DBMS_UTILITY.FORMAT_ERROR_BACKTRACE,
+                        p_context => 'Updating file',
+                        p_value => 'p_id=' || p_id || ', p_snippet_id=' || p_snippet_id || ', p_language_id=' || p_language_id || ', p_filename=' || p_filename,
+                        p_api => 'snippet_pkg.update_file'
+                );
                 RAISE;
             END IF;
     END update_file;
