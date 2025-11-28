@@ -123,7 +123,7 @@ CREATE OR REPLACE PACKAGE BODY snippet_pkg AS
                         WHEN LOWER(v.title) LIKE '%' || LOWER(v_search_query) || '%' THEN 1
                         WHEN LOWER(v.description) LIKE '%' || LOWER(v_search_query) || '%' THEN 2
                         WHEN LOWER(v.filename) LIKE '%' || LOWER(v_search_query) || '%' THEN 3
-                        WHEN LOWER(v.content) LIKE '%' || LOWER(v_search_query) || '%' THEN 4
+                        WHEN CONTAINS(v.content, v_search_query) > 0 THEN 4
                         ELSE 5
                     END AS relevance
                     FROM vw_snippet_search v
