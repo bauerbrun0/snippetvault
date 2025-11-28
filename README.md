@@ -9,7 +9,7 @@ It’s built as a monorepo containing three modules:
 
 ## Usage
 
-Create a `docker-compose.yaml` file with the following content:
+Create a `docker-compose.yaml` file with the following content (change environment variables as needed):
 ```yaml
 services:
   oracle:
@@ -59,6 +59,7 @@ docker compose up -d
 ```
 
 To access the application, open your browser and navigate to `http://localhost:8081`.
+API documentation is available at `http://localhost:8080/swagger-ui/index.html`.
 
 ## Development
 
