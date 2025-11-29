@@ -21,8 +21,7 @@ BEGIN
         job_action      => '
             BEGIN
                 DELETE FROM error_log
-                WHERE time < ADD_MONTHS(SYSDATE, -3);
-                COMMIT;
+                WHERE time < ADD_MONTHS(SYSTIMESTAMP, -1);
             EXCEPTION
                 WHEN OTHERS THEN
                     error_log_pkg.log_error(
@@ -32,6 +31,7 @@ BEGIN
                         p_value => ''N/A'',
                         p_api => ''JOB_CLEANUP_ERROR_LOG''
                     );
+                    RAISE;
             END;',
         start_date      => SYSTIMESTAMP,
         repeat_interval => 'FREQ=DAILY; BYHOUR=1',
