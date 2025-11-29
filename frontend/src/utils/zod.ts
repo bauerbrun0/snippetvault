@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const dateArraySchema = z
   .array(z.number())
-  .length(6)
+  .length(7)
   .transform((dateParts) => {
     const [year, month, day, hour, minute, second] = dateParts
 
