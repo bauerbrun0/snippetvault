@@ -148,6 +148,7 @@ BEGIN
         :NEW.dml_flag := 'I';
     ELSIF UPDATING THEN
         :NEW.updated := SYSTIMESTAMP;
+        :NEW.created := :OLD.created;
         :NEW.version := NVL(:OLD.version, 0) + 1;
         :NEW.dml_flag := 'U';
     END IF;
@@ -195,6 +196,7 @@ BEGIN
         :NEW.dml_flag := 'I';
     ELSIF UPDATING THEN
         :NEW.updated := SYSTIMESTAMP;
+        :NEW.created := :OLD.created;
         :NEW.version := NVL(:OLD.version, 0) + 1;
         :NEW.dml_flag := 'U';
     END IF;
@@ -242,6 +244,7 @@ BEGIN
         :NEW.dml_flag := 'I';
     ELSIF UPDATING THEN
         :NEW.updated := SYSTIMESTAMP;
+        :NEW.created := :OLD.created;
         :NEW.version := NVL(:OLD.version, 0) + 1;
         :NEW.dml_flag := 'U';
     END IF;
