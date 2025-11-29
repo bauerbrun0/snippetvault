@@ -41,13 +41,13 @@ CREATE SEQUENCE user_role_history_seq
 ------------
 
 
-CREATE TABLE snippetvault_user(
+CREATE TABLE snippetvault_user (
     id            NUMBER,
     username      VARCHAR2(50 CHAR)              NOT NULL,
     password_hash VARCHAR2(255 CHAR)             NOT NULL,
     created       TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
     updated       TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
-    dml_flag        VARCHAR2(1)                    NOT NULL,
+    dml_flag      VARCHAR2(1)                    NOT NULL,
     version       NUMBER                         NOT NULL
 );
 
@@ -59,7 +59,7 @@ CREATE TABLE snippetvault_user_history AS
     FROM snippetvault_user u WHERE 1=0;
 
 
-CREATE TABLE role(
+CREATE TABLE role (
     id      NUMBER,
     name    VARCHAR2(50 CHAR)              NOT NULL,
     created TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
@@ -76,14 +76,14 @@ CREATE TABLE role_history AS
     FROM role r WHERE 1=0;
 
 
-CREATE TABLE user_role(
-    id      NUMBER,
-    user_id NUMBER                         NOT NULL,
-    role_id NUMBER                         NOT NULL,
-    created TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
-    updated TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
-    dml_flag  VARCHAR2(1)                    NOT NULL,
-    version NUMBER                         NOT NULL
+CREATE TABLE user_role (
+    id       NUMBER,
+    user_id  NUMBER                         NOT NULL,
+    role_id  NUMBER                         NOT NULL,
+    created  TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    updated  TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    dml_flag VARCHAR2(1)                    NOT NULL,
+    version  NUMBER                         NOT NULL
 );
 
 CREATE TABLE user_role_history AS

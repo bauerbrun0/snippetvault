@@ -58,7 +58,7 @@ CREATE SEQUENCE snippet_tag_history_seq
 ------------
 
 
-CREATE TABLE snippet(
+CREATE TABLE snippet (
     id          NUMBER,
     user_id     NUMBER                         NOT NULL,
     title       VARCHAR2(255 CHAR)             NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE snippet_history AS
     FROM snippet s WHERE 1=0;
 
 
-CREATE TABLE snippetvault_file(
+CREATE TABLE snippetvault_file (
     id          NUMBER,
     snippet_id  NUMBER                         NOT NULL,
     filename    VARCHAR2(255 CHAR)             NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE snippetvault_file_history AS
     FROM snippetvault_file f WHERE 1=0;
 
 
-CREATE TABLE language(
+CREATE TABLE language (
     id       NUMBER,
     name     VARCHAR2(100 CHAR)             NOT NULL,
     created  TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
@@ -114,7 +114,7 @@ CREATE TABLE language_history AS
     FROM language l WHERE 1=0;
 
 
-CREATE TABLE tag(
+CREATE TABLE tag (
     id       NUMBER,
     name     VARCHAR2(150 CHAR)             NOT NULL,
     user_id  NUMBER                         NOT NULL,
@@ -133,7 +133,7 @@ CREATE TABLE tag_history AS
     FROM tag t WHERE 1=0;
 
 
-CREATE TABLE snippet_tag(
+CREATE TABLE snippet_tag (
     id         NUMBER,
     tag_id     NUMBER                         NOT NULL,
     snippet_id NUMBER                         NOT NULL,
