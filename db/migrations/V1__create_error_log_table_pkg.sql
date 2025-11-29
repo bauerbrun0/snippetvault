@@ -14,10 +14,9 @@ CREATE SEQUENCE error_log_seq
 
 -- Table --
 
-CREATE TABLE error_log
-(
+CREATE TABLE error_log (
     id              NUMBER,
-    time            TIMESTAMP DEFAULT SYSDATE,
+    time            TIMESTAMP DEFAULT SYSTIMESTAMP,
     error_message   VARCHAR2(4000),
     error_backtrace VARCHAR2(4000),
     context         VARCHAR2(4000),
